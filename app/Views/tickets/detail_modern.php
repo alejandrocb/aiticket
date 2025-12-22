@@ -104,7 +104,44 @@
             <input type="hidden" name="ticket_id" value="<?= $ticket['id'] ?>">
             <input type="hidden" name="tipo_movimiento" value="Comentario">
             
-            <textarea name="descripcion" class="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#1c2127] text-slate-900 dark:text-white min-h-[100px] p-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors" placeholder="Escribe tu respuesta o comentario aquí..." required></textarea>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Selector de Estado -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Estado</label>
+                    <div class="relative">
+                        <select name="estado_ticket_id" class="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#1c2127] text-slate-900 dark:text-white p-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none appearance-none cursor-pointer">
+                            <?php foreach ($estados as $est): ?>
+                                <option value="<?= $est['id'] ?>" <?= $est['id'] == $ticket['estado_ticket_id'] ? 'selected' : '' ?>>
+                                    <?= $est['nombre'] ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500">
+                             <span class="material-symbols-outlined text-[20px]">expand_more</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Selector de Responsable (Solo visible para internos si se desea, o para todos) -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Responsable</label>
+                    <div class="relative">
+                         <select name="responsable_id" class="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#1c2127] text-slate-900 dark:text-white p-2.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none appearance-none cursor-pointer">
+                            <option value="">Sin Asignar</option>
+                            <?php foreach ($responsables as $resp): ?>
+                                <option value="<?= $resp['id'] ?>" <?= $resp['id'] == $ticket['responsable_id'] ? 'selected' : '' ?>>
+                                    <?= $resp['nombre'] ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500">
+                             <span class="material-symbols-outlined text-[20px]">expand_more</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <textarea name="descripcion" class="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#1c2127] text-slate-900 dark:text-white min-h-[100px] p-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors" placeholder="Escribe tu respuesta o comentario aquí... (Opcional si cambias estado/responsable)"></textarea>
             
             <div class="flex flex-col gap-2">
                 <label class="text-[#111418] dark:text-white text-base font-medium leading-normal">Adjuntos</label>
