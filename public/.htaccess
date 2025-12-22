@@ -1,0 +1,33 @@
+<IfModule authz_core_module>
+    Require all granted
+</IfModule>
+<IfModule !authz_core_module>
+    Deny from all
+</IfModule>
+<IfModule mod_rewrite.c>
+    Options +FollowSymlinks
+    RewriteEngine On
+
+    # Block access to "hidden" directories or files whose names begin with a period.
+    # This includes directories used by version control systems such as Git and SVN.
+    RewriteRule "(^|/)\." - [F]
+
+    # Block access to build scripts.
+    RewriteRule "^(.*/)?Buildfile((?:\.bat|\.cmd|\.ps1))?$" - [F]
+
+    # Block access to tests and other internal directories.
+    RewriteRule "^(tests|builds|spark|phpunit\.xml)(/.*)?$" - [F]
+
+    # Checks to see if the user is attempting to access a valid file,
+    # such as an image or css document, if this isn't true, it sends the
+    # request to the index.php file
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+<IfModule !mod_rewrite.c>
+    # If we don't have mod_rewrite installed, all 404's
+    # can be sent to index.php, and everything works as normal.
+    ErrorDocument 404 /index.php
+</IfModule>

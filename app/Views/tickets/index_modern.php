@@ -15,9 +15,9 @@
         <span class="material-symbols-outlined text-sm">lock_open</span>
         <p class="text-sm font-semibold leading-normal">Abiertos</p>
     </button>
-    <button id="btn-filter-all" class="filter-toggle-btn flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-surface-light dark:bg-surface-dark border border-[#e5e7eb] dark:border-transparent pl-4 pr-5 hover:bg-gray-100 dark:hover:bg-[#2c3b4a] transition-colors active:scale-95 text-[#111418] dark:text-white" data-mode="all">
-        <span class="material-symbols-outlined text-sm">list</span>
-        <p class="text-sm font-medium leading-normal">Todos</p>
+    <button id="btn-filter-closed" class="filter-toggle-btn flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-surface-light dark:bg-surface-dark border border-[#e5e7eb] dark:border-transparent pl-4 pr-5 hover:bg-gray-100 dark:hover:bg-[#2c3b4a] transition-colors active:scale-95 text-[#111418] dark:text-white" data-mode="closed">
+        <span class="material-symbols-outlined text-sm">check_circle</span>
+        <p class="text-sm font-medium leading-normal">Cerrados</p>
     </button>
 </div>
 
@@ -104,9 +104,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const ticketItems = document.querySelectorAll('.ticket-item');
     const filterBtns = document.querySelectorAll('.filter-toggle-btn');
     
-    // Status Logic
-    const closedStatuses = ['cerrado', 'cerrada', 'finalizada', 'anulada'];
-    let currentMode = 'open'; // 'open' or 'all'
+    // Configuración de Estados
+    const hiddenStatuses = ['anulada', 'anulado']; // Status never shown
+    const closedStatuses = ['cerrado', 'cerrada', 'finalizada', 'finalizado']; // Status for 'Closed' tab
+    
+    let currentMode = 'open'; // 'open' or 'closed'
 
     // Init
     applyFilters();
@@ -121,14 +123,18 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Visual Update Buttons
             filterBtns.forEach(b => {
-                // Reset to unassigned style
+                // Reset to regular style
                 b.classList.remove('bg-primary', 'text-white', 'shadow-lg');
                 b.classList.add('bg-surface-light', 'dark:bg-surface-dark', 'text-[#111418]', 'dark:text-white', 'border');
+                
+                // Reset icon color if needed (optional)
+                b.querySelector('span').classList.remove('text-white');
             });
             
             // Set active style
             this.classList.remove('bg-surface-light', 'dark:bg-surface-dark', 'text-[#111418]', 'dark:text-white', 'border');
             this.classList.add('bg-primary', 'text-white', 'shadow-lg');
+            this.querySelector('span').classList.add('text-white');
 
             applyFilters();
         });
@@ -143,21 +149,33 @@ document.addEventListener('DOMContentLoaded', function() {
             const desc = item.dataset.desc;
             const id = item.dataset.id;
             
+            // 0. Global Filter: Anulados are always hidden
+            const isAnnulled = hiddenStatuses.some(s => status.includes(s));
+            if (isAnnulled) {
+                item.style.display = 'none';
+                return; // Skip rest of logic
+            }
+
             // 1. Check Search Term
             const matchesSearch = client.includes(searchTerm) || 
                                   desc.includes(searchTerm) || 
                                   status.includes(searchTerm) || 
                                   id.includes(searchTerm);
 
-            // 2. Check Status Filter
-            let matchesStatus = true;
+            // 2. Check Tab Filter
+            let matchesTab = false;
+            const isClosed = closedStatuses.some(s => status.includes(s));
+
             if (currentMode === 'open') {
-                const isClosed = closedStatuses.some(s => status.includes(s));
-                if (isClosed) matchesStatus = false;
+                // Show ONLY if NOT closed
+                matchesTab = !isClosed;
+            } else if (currentMode === 'closed') {
+                // Show ONLY if IS closed
+                matchesTab = isClosed;
             }
 
             // Final Visibility
-            if (matchesSearch && matchesStatus) {
+            if (matchesSearch && matchesTab) {
                 item.style.display = 'flex';
             } else {
                 item.style.display = 'none';

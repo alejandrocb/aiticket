@@ -4,6 +4,8 @@ namespace App\Controllers;
 
 use App\Models\NotificationModel;
 use App\Models\TicketModel;
+use App\Models\EstadosTicketModel;
+use App\Models\UsuarioModel;
 use CodeIgniter\RESTful\ResourceController;
 
 class TicketMovimientos extends ResourceController
@@ -44,10 +46,65 @@ class TicketMovimientos extends ResourceController
         }
 
         $ticketId = $this->request->getPost('ticket_id');
+        $ticketModel = new TicketModel();
+        $ticket = $ticketModel->find($ticketId);
+
+        if (!$ticket) {
+            return redirect()->back()->with('errors', 'Ticket no encontrado');
+        }
+
+        // Logic to update Ticket if changed
+        $nuevoEstado = $this->request->getPost('estado_ticket_id');
+        $nuevoResponsable = $this->request->getPost('responsable_id');
+        $descripcionUsuario = $this->request->getPost('descripcion');
+
+        $updates = [];
+        $changesLog = [];
+
+        if ($nuevoEstado && $nuevoEstado != $ticket['estado_ticket_id']) {
+            $updates['estado_ticket_id'] = $nuevoEstado;
+            $estadoModel = new EstadosTicketModel();
+            $oldSt = $estadoModel->find($ticket['estado_ticket_id']);
+            $newSt = $estadoModel->find($nuevoEstado);
+            $changesLog[] = "Estado cambiado de " . ($oldSt['nombre'] ?? 'N/A') . " a " . ($newSt['nombre'] ?? 'N/A');
+        }
+
+        if ($nuevoResponsable && $nuevoResponsable != $ticket['responsable_id']) {
+            $updates['responsable_id'] = $nuevoResponsable;
+            $usuarioModel = new UsuarioModel();
+            $oldUser = $usuarioModel->find($ticket['responsable_id']);
+            $newUser = $usuarioModel->find($nuevoResponsable);
+            $oldName = $oldUser ? $oldUser['nombre'] : 'Sin asignar';
+            $newName = $newUser ? $newUser['nombre'] : 'Sin asignar';
+            $changesLog[] = "Responsable cambiado de {$oldName} a {$newName}";
+        }
+
+        if (!empty($updates)) {
+            $ticketModel->update($ticketId, $updates);
+            // Refresh ticket data for notification logic later
+            $ticket = $ticketModel->find($ticketId);
+        }
+
+        // Validate that we have SOMETHING
+        if (empty($descripcionUsuario) && empty($changesLog) && empty($mediaFiles)) {
+             return redirect()->back()->with('errors', 'Debe escribir un comentario, subir un archivo o cambiar el estado/responsable.');
+        }
+
+        // Construct final description
+        $finalDesc = $descripcionUsuario;
+        if (!empty($changesLog)) {
+            if (!empty($finalDesc)) $finalDesc .= "\n\n";
+            $finalDesc .= implode("; ", $changesLog);
+        }
+        // Fallback title if description was empty
+        if (empty($finalDesc) && !empty($changesLog)) {
+             $finalDesc = "Actualización de ticket: " . implode("; ", $changesLog);
+        }
+
         $data = [
             'ticket_id' => $ticketId,
             'tipo_movimiento' => $this->request->getPost('tipo_movimiento'),
-            'descripcion' => $this->request->getPost('descripcion'),
+            'descripcion' => $finalDesc,
             'usuario_id' => session()->get('id'),
             'media' => json_encode($mediaFiles)
         ];
@@ -69,10 +126,18 @@ class TicketMovimientos extends ResourceController
                 });
 
                 foreach ($recipients as $recipientId) {
+                    $notifTitle = 'Nuevo comentario en ticket';
+                    $notifMessage = "Se ha añadido un nuevo comentario al ticket #{$ticketId}.";
+
+                    if (!empty($changesLog)) {
+                        $notifTitle = 'Actualización de Ticket';
+                        $notifMessage = "El ticket #{$ticketId} ha sido actualizado: " . implode(", ", $changesLog);
+                    }
+
                     $notificationModel->insert([
                         'user_id' => $recipientId,
-                        'title' => 'Nuevo detalle en ticket',
-                        'message' => "Se ha añadido un nuevo detalle al ticket #{$ticketId}.",
+                        'title' => $notifTitle,
+                        'message' => $notifMessage,
                         'link' => "/tickets/detail/{$ticketId}",
                         'created_at' => date('Y-m-d H:i:s')
                     ]);
