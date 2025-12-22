@@ -1,0 +1,26 @@
+# CodeIgniter 4
+/vendor/
+/builds/
+/node_modules/
+/public/assets/*
+!/public/assets/index.html
+/public/index.php
+/writable/cache/
+/writable/debugbar/
+/writable/logs/
+/writable/session/
+/writable/uploads/
+/writable/debugbar/
+/tests/_support/_generated
+/.env
+/local/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
