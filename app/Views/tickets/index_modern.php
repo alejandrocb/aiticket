@@ -39,11 +39,11 @@
             <?php 
                 // Determinar colores basados en prioridad
                 $priorityColor = 'text-gray-500 bg-gray-500/10 ring-gray-500/20';
-                if (stripos($ticket['prioridad_nombre'], 'alta') !== false) {
+                if (stripos($ticket['prioridad_ticket_nombre'], 'alta') !== false) {
                     $priorityColor = 'text-red-400 bg-red-400/10 ring-red-400/20';
-                } elseif (stripos($ticket['prioridad_nombre'], 'media') !== false) {
+                } elseif (stripos($ticket['prioridad_ticket_nombre'], 'media') !== false) {
                     $priorityColor = 'text-amber-400 bg-amber-400/10 ring-amber-400/20';
-                } elseif (stripos($ticket['prioridad_nombre'], 'baja') !== false) {
+                } elseif (stripos($ticket['prioridad_ticket_nombre'], 'baja') !== false) {
                     $priorityColor = 'text-green-400 bg-green-400/10 ring-green-400/20';
                 }
             ?>
@@ -53,7 +53,7 @@
                data-status="<?= strtolower(esc($ticket['estado_nombre'])) ?>"
                data-desc="<?= strtolower(esc($ticket['descripcion'])) ?>"
                data-id="<?= $ticket['id'] ?>"
-               data-timestamp="<?= strtotime($ticket['fecha_creacion'] ?? 'now') ?>"
+               data-timestamp="<?= strtotime($ticket['fecha_relevante'] ?? $ticket['fecha_creacion']) ?>"
             >
                 <div class="flex justify-between items-start">
                     <div class="flex items-center gap-3">
@@ -69,12 +69,21 @@
                         </div>
                     </div>
                     <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset <?= $priorityColor ?>">
-                        <?= esc($ticket['prioridad_nombre']) ?>
+                        <?= esc($ticket['prioridad_ticket_nombre']) ?>
                     </span>
                 </div>
                 <div>
-                    <p class="text-[#111418] dark:text-white text-base font-semibold leading-normal mb-1 ticket-desc"><?= esc(substr($ticket['descripcion'], 0, 50)) ?>...</p>
-                    <p class="text-text-secondary text-sm font-normal leading-relaxed line-clamp-2"><?= esc($ticket['descripcion']) ?></p>
+                    <!-- Primary Description (Ticket Title/Desc) -->
+                    <p class="text-[#111418] dark:text-white text-base font-bold leading-normal mb-1 ticket-desc"><?= esc(substr($ticket['descripcion'], 0, 80)) . (strlen($ticket['descripcion']) > 80 ? '...' : '') ?></p>
+                    
+                    <!-- Secondary Description (Last User Movement) -->
+                    <?php if (!empty($ticket['ultimo_movimiento'])): ?>
+                         <div class="flex items-center gap-2 mt-1">
+                            <span class="material-symbols-outlined text-xs text-text-secondary">chat</span>
+                            <p class="text-text-secondary text-sm font-medium leading-relaxed line-clamp-1 italic">"<?= esc($ticket['ultimo_movimiento']) ?>"</p>
+                            <span class="text-[10px] text-text-secondary">• <?= date('d/m/Y', strtotime($ticket['fecha_ultimo_movimiento'])) ?></span>
+                        </div>
+                    <?php endif; ?>
                 </div>
                 <div class="h-px w-full bg-[#e5e7eb] dark:bg-[#2c3b4a]"></div>
                 <div class="flex items-center justify-between">

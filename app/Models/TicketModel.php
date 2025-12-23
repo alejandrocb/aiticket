@@ -62,12 +62,16 @@ class TicketModel extends Model
                     ->first();
     }
 
-    public function getTicketsWithClients()
+    public function getTicketsWithClients($clienteId = null)
     {
         $escenariosActivos = $this->getEscenariosActivos();
 
         if (empty($escenariosActivos)) {
             return [];
+        }
+
+        if ($clienteId) {
+            $this->where('tickets.cliente_id', $clienteId);
         }
 
             return $this->select('tickets.*, 

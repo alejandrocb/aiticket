@@ -46,25 +46,10 @@ class Tickets extends Controller
 
         // Si es admin (rol 1) o soporte (rol 2), ve todos los tickets de sus escenarios
         if ($roleId == 1 || $roleId == 2) {
-             $tickets = $this->ticketModel->select('tickets.*, clientes.nombre as cliente_nombre, usuarios.nombre as responsable_nombre, estados_ticket.nombre as estado_nombre, prioridades_ticket.nombre as prioridad_nombre, tipos_ticket.nombre as tipo_nombre')
-            ->join('clientes', 'clientes.id = tickets.cliente_id')
-            ->join('usuarios', 'usuarios.id = tickets.responsable_id', 'left')
-            ->join('estados_ticket', 'estados_ticket.id = tickets.estado_ticket_id')
-            ->join('prioridades_ticket', 'prioridades_ticket.id = tickets.prioridad_ticket_id')
-            ->join('tipos_ticket', 'tipos_ticket.id = tickets.tipo_ticket_id')
-            ->whereIn('tickets.escenario_id', $escenariosActivos)
-            ->findAll();
+             $tickets = $this->ticketModel->getTicketsWithClients();
         } else {
             // Si es cliente (rol 3), solo ve sus propios tickets
-             $tickets = $this->ticketModel->select('tickets.*, clientes.nombre as cliente_nombre, usuarios.nombre as responsable_nombre, estados_ticket.nombre as estado_nombre, prioridades_ticket.nombre as prioridad_nombre, tipos_ticket.nombre as tipo_nombre')
-            ->join('clientes', 'clientes.id = tickets.cliente_id')
-            ->join('usuarios', 'usuarios.id = tickets.responsable_id', 'left')
-            ->join('estados_ticket', 'estados_ticket.id = tickets.estado_ticket_id')
-            ->join('prioridades_ticket', 'prioridades_ticket.id = tickets.prioridad_ticket_id')
-            ->join('tipos_ticket', 'tipos_ticket.id = tickets.tipo_ticket_id')
-            ->where('tickets.cliente_id', session()->get('cliente_id')) // Asumiendo que guardamos cliente_id en sesión
-            ->whereIn('tickets.escenario_id', $escenariosActivos)
-            ->findAll();
+             $tickets = $this->ticketModel->getTicketsWithClients(session()->get('cliente_id'));
         }
 
         $data = [
