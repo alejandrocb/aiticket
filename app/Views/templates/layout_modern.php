@@ -95,16 +95,34 @@
     </div>
 
     <!-- Main Content -->
-    <div class="flex-1 flex flex-col md:ml-64">
+    <div class="flex-1 flex flex-col md:ml-64 min-w-0 overflow-x-hidden">
         <!-- Top Sticky Header -->
         <div class="sticky top-0 z-20 bg-background-light dark:bg-background-dark/95 backdrop-blur-md border-b border-[#e5e7eb] dark:border-[#283039]">
             <div class="flex items-center p-4 pb-2 justify-between">
                 <h2 class="text-[#111418] dark:text-white text-2xl font-bold leading-tight tracking-[-0.015em] flex-1 md:hidden">Soporte</h2>
                 <h2 class="text-[#111418] dark:text-white text-2xl font-bold leading-tight tracking-[-0.015em] flex-1 hidden md:block"><?= $title ?? 'Dashboard'; ?></h2>
                 <div class="flex items-center justify-end gap-3">
-                    <button class="flex items-center justify-center rounded-full h-10 w-10 bg-transparent text-[#111418] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
-                        <span class="material-symbols-outlined">notifications</span>
-                    </button>
+                    <div class="relative" id="notifications-container">
+                        <button id="btn-notifications" class="flex items-center justify-center rounded-full h-10 w-10 bg-transparent text-[#111418] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors relative">
+                            <span class="material-symbols-outlined">notifications</span>
+                            <span id="notif-badge" class="absolute top-2 right-2 h-2.5 w-2.5 rounded-full bg-red-500 border border-white dark:border-[#101922] hidden"></span>
+                        </button>
+                        
+                        <!-- Notifications Dropdown -->
+                        <div id="notifications-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-white dark:bg-[#1c2630] rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 z-50 overflow-hidden">
+                            <div class="p-3 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
+                                <h3 class="text-sm font-semibold text-slate-900 dark:text-white">Notificaciones</h3>
+                                <a href="<?= base_url('notifications/markAllRead') ?>" class="text-xs text-primary hover:underline">Marcar leídas</a>
+                            </div>
+                            <div id="notifications-list" class="max-h-80 overflow-y-auto">
+                                <!-- Loaded via JS -->
+                                <div class="p-4 text-center text-slate-500 text-xs">Cargando...</div>
+                            </div>
+                            <a href="<?= base_url('notifications') ?>" class="block p-2 text-center text-xs font-medium text-primary bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                Ver todas
+                            </a>
+                        </div>
+                    </div>
                     <a href="<?= base_url('tickets/crear') ?>" class="flex items-center justify-center rounded-lg h-10 w-10 bg-primary text-white shadow-lg shadow-primary/30 hover:bg-primary/90 transition-colors">
                         <span class="material-symbols-outlined">add</span>
                     </a>
@@ -141,5 +159,77 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const btnNotif = document.getElementById('btn-notifications');
+        const dropdown = document.getElementById('notifications-dropdown');
+        const badge = document.getElementById('notif-badge');
+        const list = document.getElementById('notifications-list');
+        const container = document.getElementById('notifications-container');
+
+        // Toggle Dropdown
+        btnNotif.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdown.classList.toggle('hidden');
+        });
+
+        // Close when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!container.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+
+        // Fetch Notifications
+        function loadNotifications() {
+            fetch('<?= base_url('notifications/list') ?>')
+                .then(res => res.json())
+                .then(data => {
+                    // Update Badge
+                    if (data.unread_count > 0) {
+                        badge.classList.remove('hidden');
+                    } else {
+                        badge.classList.add('hidden');
+                    }
+
+                    // Build List
+                    list.innerHTML = '';
+                    if (data.notifications.length === 0) {
+                        list.innerHTML = '<div class="p-4 text-center text-slate-500 text-xs">No tienes notificaciones.</div>';
+                    } else {
+                        data.notifications.forEach(notif => {
+                            const isReadClass = notif.is_read == 1 ? 'opacity-60' : 'bg-blue-50/50 dark:bg-blue-900/10';
+                            const link = notif.link ? `href="${notif.link}"` : '#';
+                            
+                            const html = `
+                                <a ${link} class="block p-3 border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors ${isReadClass}" onclick="markAsRead(${notif.id})">
+                                    <div class="flex gap-3">
+                                        <div class="mt-1 h-2 w-2 rounded-full ${notif.is_read == 0 ? 'bg-primary' : 'bg-transparent'} shrink-0"></div>
+                                        <div>
+                                            <p class="text-sm font-medium text-slate-900 dark:text-white leading-tight mb-1">${notif.title}</p>
+                                            <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">${notif.message}</p>
+                                            <span class="text-[10px] text-slate-400 mt-1 block">${notif.created_at}</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            `;
+                            list.innerHTML += html;
+                        });
+                    }
+                })
+                .catch(err => console.error('Error loading notifications:', err));
+        }
+
+        // Global function to mark read
+        window.markAsRead = function(id) {
+            fetch('<?= base_url('notifications/markRead') ?>/' + id);
+            // Don't wait, proceed to link
+        };
+
+        // Initial Load and Interval
+        loadNotifications();
+        setInterval(loadNotifications, 60000); // Check every minute
+    });
+</script>
 </body>
 </html>

@@ -17,7 +17,10 @@ class Notifications extends Controller
     public function index()
     {
         $userId = session()->get('id');
-        $notifications = $this->notificationModel->getNotifications($userId);
+        $notifications = $this->notificationModel
+                                ->where('user_id', $userId)
+                                ->orderBy('created_at', 'DESC')
+                                ->findAll();
         
         // Mark all as read when viewing list? Or just show them.
         // Usually list shows read/unread. User can click to mark read or click "Mark all read".
@@ -33,10 +36,18 @@ class Notifications extends Controller
 
     public function list()
     {
-         // API method for fetching notifications via AJAX (for navbar)
          $userId = session()->get('id');
-         $notifications = $this->notificationModel->getNotifications($userId, 5);
-         $unreadCount = $this->notificationModel->getUnreadCount($userId);
+         
+         // Standard Model usage
+         $notifications = $this->notificationModel
+                                ->where('user_id', $userId)
+                                ->orderBy('created_at', 'DESC')
+                                ->findAll(5);
+                                
+         $unreadCount = $this->notificationModel
+                               ->where('user_id', $userId)
+                               ->where('is_read', 0)
+                               ->countAllResults();
 
          return $this->response->setJSON([
              'notifications' => $notifications,
@@ -46,7 +57,7 @@ class Notifications extends Controller
 
     public function markRead($id)
     {
-        $this->notificationModel->markAsRead($id);
+        $this->notificationModel->update($id, ['is_read' => 1]);
         // If it has a link, redirect to it?
         // Or if called via AJAX, return success.
         

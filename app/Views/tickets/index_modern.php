@@ -23,7 +23,7 @@
 
 <div class="flex items-center justify-between mb-2">
     <p class="text-sm font-semibold text-text-secondary uppercase tracking-wider">Lista de Tickets</p>
-    <button class="flex items-center text-primary text-sm font-medium gap-1">
+    <button id="btn-sort-date" class="flex items-center text-primary text-sm font-medium gap-1 cursor-pointer hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg px-2 py-1 transition-colors">
         Fecha de creación <span class="material-symbols-outlined text-sm">sort</span>
     </button>
 </div>
@@ -53,6 +53,7 @@
                data-status="<?= strtolower(esc($ticket['estado_nombre'])) ?>"
                data-desc="<?= strtolower(esc($ticket['descripcion'])) ?>"
                data-id="<?= $ticket['id'] ?>"
+               data-timestamp="<?= strtotime($ticket['fecha_creacion'] ?? 'now') ?>"
             >
                 <div class="flex justify-between items-start">
                     <div class="flex items-center gap-3">
@@ -138,7 +139,35 @@ document.addEventListener('DOMContentLoaded', function() {
 
             applyFilters();
         });
+        });
     });
+
+    // Sort Logic
+    const sortBtn = document.getElementById('btn-sort-date');
+    const ticketsContainer = document.getElementById('tickets-container');
+    let sortAsc = false; // Default desc (newest first)
+
+    if(sortBtn) {
+        sortBtn.addEventListener('click', function() {
+            const items = Array.from(ticketsContainer.querySelectorAll('.ticket-item'));
+            
+            items.sort((a, b) => {
+                const timeA = parseInt(a.dataset.timestamp || 0);
+                const timeB = parseInt(b.dataset.timestamp || 0);
+                return sortAsc ? (timeA - timeB) : (timeB - timeA);
+            });
+
+            // Re-append in new order
+            items.forEach(item => ticketsContainer.appendChild(item));
+            
+            // Toggle direction
+            sortAsc = !sortAsc;
+            
+            // Update Icon
+            const icon = this.querySelector('span');
+            icon.textContent = sortAsc ? 'arrow_upward' : 'arrow_downward';
+        });
+    }
 
     function applyFilters() {
         const searchTerm = searchInput.value.toLowerCase();
