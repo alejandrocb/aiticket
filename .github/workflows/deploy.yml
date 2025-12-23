@@ -19,7 +19,7 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: ./ # Carpeta destino en el servidor (ej: /public_html/) o ./ si es la raiz del usuario FTP
+          server-dir: /html/aiticket
           exclude: |
             **/.git*
             **/.git*/**
