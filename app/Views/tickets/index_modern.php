@@ -139,7 +139,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
             applyFilters();
         });
-        });
     });
 
     // Sort Logic
