@@ -95,7 +95,7 @@
     </div>
 
     <!-- Main Content -->
-    <div class="flex-1 flex flex-col md:ml-64 w-full">
+    <div class="flex-1 flex flex-col md:ml-64">
         <!-- Top Sticky Header -->
         <div class="sticky top-0 z-20 bg-background-light dark:bg-background-dark/95 backdrop-blur-md border-b border-[#e5e7eb] dark:border-[#283039]">
             <div class="flex items-center p-4 pb-2 justify-between">
