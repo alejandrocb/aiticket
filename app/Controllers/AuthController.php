@@ -45,7 +45,7 @@ class AuthController extends Controller
             //return $this->response->setJSON($response);
             return redirect()->to('/');
         } else {
-            return $this->response->setJSON(['success' => false, 'message' => 'Email o contraseña incorrectos']);
+            return redirect()->back()->withInput()->with('error', 'Email o contraseña incorrectos');
         }
     }
 

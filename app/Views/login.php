@@ -60,6 +60,12 @@
                 </label>
             </div>
         </div>
+        <?php if (session()->getFlashdata('error')): ?>
+            <div class="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 flex items-center gap-3">
+                <span class="material-symbols-outlined text-red-500 dark:text-red-400">error</span>
+                <p class="text-sm font-medium text-red-600 dark:text-red-300"><?= session()->getFlashdata('error') ?></p>
+            </div>
+        <?php endif; ?>
         <form class="flex flex-col gap-6" action="<?= site_url('login') ?>" method="post">
             <div class="flex flex-col w-full space-y-2">
                 <label class="text-[#111418] dark:text-white text-sm font-semibold leading-normal ml-1" for="email">Correo Electrónico</label>
