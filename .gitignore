@@ -13,6 +13,7 @@
 /writable/debugbar/
 /tests/_support/_generated
 /.env
+/.env.production
 /local/
 
 # IDE
