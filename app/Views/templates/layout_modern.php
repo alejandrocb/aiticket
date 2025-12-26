@@ -182,7 +182,7 @@
 
         // Fetch Notifications
         function loadNotifications() {
-            fetch('<?= base_url('notifications/list') ?>')
+            fetch('/notifications/list')
                 .then(res => res.json())
                 .then(data => {
                     // Update Badge
@@ -222,7 +222,7 @@
 
         // Global function to mark read
         window.markAsRead = function(id) {
-            fetch('<?= base_url('notifications/markRead') ?>/' + id);
+            fetch('/notifications/markRead/' + id);
             // Don't wait, proceed to link
         };
 
