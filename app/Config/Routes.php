@@ -13,6 +13,9 @@ $routes->get('logout', 'AuthController::logout');
 
 // Rutas que requieren autenticación
 $routes->group('', ['filter' => 'auth'], function($routes) {
+    $routes->post('push/subscribe', 'PushController::subscribe');
+    $routes->get('push/test', 'PushController::test');
+    
     $routes->get('dashboard', 'Home::index');
     $routes->get('/', 'Home::index');
 $routes->get('/system/migrate/(:any)', 'SystemController::runMigrations/$1');

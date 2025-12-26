@@ -231,5 +231,15 @@
         setInterval(loadNotifications, 60000); // Check every minute
     });
 </script>
+    <!-- Push Notifications -->
+    <script src="<?= base_url('assets/js/push-handler.js') ?>"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const vapidKey = '<?= env('VAPID_PUBLIC_KEY') ?>';
+            if (vapidKey) {
+                PushHandler.init(vapidKey);
+            }
+        });
+    </script>
 </body>
 </html>
