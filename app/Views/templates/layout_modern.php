@@ -245,7 +245,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const vapidKey = '<?= env('VAPID_PUBLIC_KEY') ?>';
             if (vapidKey) {
-                PushHandler.init(vapidKey);
+                PushHandler.init(vapidKey, '<?= base_url() ?>');
             }
         });
     </script>
