@@ -96,6 +96,27 @@
                 <h2 class="text-[#111418] dark:text-white text-2xl font-bold leading-tight tracking-[-0.015em] flex-1 md:hidden">Soporte</h2>
                 <h2 class="text-[#111418] dark:text-white text-2xl font-bold leading-tight tracking-[-0.015em] flex-1 hidden md:block"><?= $title ?? 'Dashboard'; ?></h2>
                 <div class="flex items-center justify-end gap-3">
+                    <a href="<?= base_url('tickets/crear') ?>" class="flex items-center justify-center rounded-lg h-10 w-10 bg-primary text-white shadow-lg shadow-primary/30 hover:bg-primary/90 transition-colors">
+                        <span class="material-symbols-outlined">add</span>
+                    </a>
+
+                    <!-- User Profile Button -->
+                    <div class="flex items-center gap-3 ml-1 pl-3 border-l border-slate-200 dark:border-slate-800">
+                        <div class="hidden md:flex flex-col items-end">
+                            <span class="text-sm font-semibold text-slate-900 dark:text-white leading-none mb-1"><?= session()->get('nombre') ?></span>
+                            <span class="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider">Mi Perfil</span>
+                        </div>
+                        <a href="<?= base_url('profile') ?>" class="relative group h-10 w-10 rounded-full border-2 border-white dark:border-slate-800 shadow-sm group-hover:border-primary transition-all overflow-hidden flex items-center justify-center bg-primary/10 text-primary">
+                            <!-- Initials (Underlay) -->
+                            <span class="font-bold text-sm"><?= strtoupper(substr(session()->get('nombre'), 0, 2)) ?></span>
+                            
+                            <!-- Image (Overlay) -->
+                            <?php if (session()->get('imagen')): ?>
+                                <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<?= base_url(session()->get('imagen')) ?>')"></div>
+                            <?php endif; ?>
+                        </a>
+                    </div>
+
                     <div class="relative" id="notifications-container">
                         <button id="btn-notifications" class="flex items-center justify-center rounded-full h-10 w-10 bg-transparent text-[#111418] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors relative">
                             <span class="material-symbols-outlined">notifications</span>
@@ -116,26 +137,6 @@
                                 Ver todas
                             </a>
                         </div>
-                    </div>
-                    <a href="<?= base_url('tickets/crear') ?>" class="flex items-center justify-center rounded-lg h-10 w-10 bg-primary text-white shadow-lg shadow-primary/30 hover:bg-primary/90 transition-colors">
-                        <span class="material-symbols-outlined">add</span>
-                    </a>
-
-                    <!-- User Profile Button -->
-                    <div class="flex items-center gap-3 ml-1 pl-3 border-l border-slate-200 dark:border-slate-800">
-                        <div class="hidden md:flex flex-col items-end">
-                            <span class="text-sm font-semibold text-slate-900 dark:text-white leading-none mb-1"><?= session()->get('nombre') ?></span>
-                            <span class="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider">Mi Perfil</span>
-                        </div>
-                        <a href="<?= base_url('profile') ?>" class="relative group h-10 w-10 rounded-full border-2 border-white dark:border-slate-800 shadow-sm group-hover:border-primary transition-all overflow-hidden flex items-center justify-center bg-primary/10 text-primary">
-                            <!-- Initials (Underlay) -->
-                            <span class="font-bold text-sm"><?= strtoupper(substr(session()->get('nombre'), 0, 2)) ?></span>
-                            
-                            <!-- Image (Overlay) -->
-                            <?php if (session()->get('imagen')): ?>
-                                <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<?= base_url(session()->get('imagen')) ?>')"></div>
-                            <?php endif; ?>
-                        </a>
                     </div>
                 </div>
             </div>
@@ -161,10 +162,6 @@
                 <button class="flex flex-col items-center justify-center w-full h-full gap-1 group">
                     <span class="material-symbols-outlined text-text-secondary group-hover:text-primary transition-colors">bar_chart</span>
                     <span class="text-[10px] font-medium text-text-secondary group-hover:text-primary">Reportes</span>
-                </button>
-                <button class="flex flex-col items-center justify-center w-full h-full gap-1 group">
-                    <div class="h-6 w-6 rounded-full bg-cover bg-center border border-transparent group-hover:border-primary transition-colors" data-alt="User profile picture" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDnDQpiODsqGs8p2ABwphK9A97hhZFah0pgGh7x6Uvw1ebRamKOBTnXBFgzPjCE_06miHRtm8NspJxj50xa3HCgOeNWWIn-RNMtOdLfX78W7DMtay9TWML4hU2hX7OzRL94ttCc1geP0pTKuGY9sJz7BghpR_tEHYZtkBWrxr8YrzsxFTzvu-kjIb9e0H9M2k2xPres1F8Vfdayt3SKUCjAzBhePrKkbD2_efnCm7i11yZMJUrHO_SHimiL9xt7LJLRjXbnJOZvK2g");'></div>
-                    <span class="text-[10px] font-medium text-text-secondary group-hover:text-primary">Perfil</span>
                 </button>
             </div>
         </div>
