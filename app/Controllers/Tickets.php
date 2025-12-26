@@ -51,6 +51,30 @@ class Tickets extends Controller
             // Si es cliente (rol 3), solo ve sus propios tickets
              $tickets = $this->ticketModel->getTicketsWithClients(session()->get('cliente_id'));
         }
+        
+        // --- Lógica Check 1: Marcar como Visto (visto_responsable_at) ---
+        // Si el usuario actual es el responsable Y no lo ha visto aún
+        if ($tickets) {
+            $idsToMarkAsSeen = [];
+            foreach ($tickets as $t) {
+                if ($t['responsable_id'] == $userId && empty($t['visto_responsable_at'])) {
+                    $idsToMarkAsSeen[] = $t['id'];
+                }
+            }
+            if (!empty($idsToMarkAsSeen)) {
+                $now = date('Y-m-d H:i:s');
+                $this->ticketModel->whereIn('id', $idsToMarkAsSeen)
+                                  ->set(['visto_responsable_at' => $now])
+                                  ->update();
+                
+                // Actualizar en memoria para que se vea reflejado ya
+                foreach ($tickets as &$t) {
+                    if (in_array($t['id'], $idsToMarkAsSeen)) {
+                        $t['visto_responsable_at'] = $now;
+                    }
+                }
+            }
+        }
 
         $data = [
             'title' => 'Listado de Tickets',
@@ -224,6 +248,12 @@ class Tickets extends Controller
                 'usuario_id' => session()->get('id')
             ];
             $ticketMovimientoModel->insert($movimiento);
+
+            // Resetear Checks porque cambió el responsable
+             $ticketModel->update($id, [
+                'visto_responsable_at' => null,
+                'leido_responsable_at' => null
+            ]);
         }
 
         // Comprobar cambios en el estado
@@ -318,6 +348,18 @@ class Tickets extends Controller
         $ticket = $this->ticketModel->find($id);
         if (!$ticket) {
             return redirect()->to('/tickets')->with('errors', 'Ticket no encontrado.');
+        }
+
+        // --- Lógica Check 2: Marcar como Leído (leido_responsable_at) ---
+        // Si el usuario actual es el responsable y entra al detalle, marcamos ambos (visto y leído) por si acaso.
+        if ($ticket['responsable_id'] == session()->get('id') && empty($ticket['leido_responsable_at'])) {
+             $this->ticketModel->update($id, [
+                // Si entra directo al detalle sin pasar por lista (link email), también cuenta como visto
+                'visto_responsable_at' => $ticket['visto_responsable_at'] ?? date('Y-m-d H:i:s'),
+                'leido_responsable_at' => date('Y-m-d H:i:s')
+             ]);
+             // Actualizamos la variable ticket local para la vista
+             $ticket['leido_responsable_at'] = date('Y-m-d H:i:s');
         }
 
         // Obtener todos los usuarios en una sola consulta

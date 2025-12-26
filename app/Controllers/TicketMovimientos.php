@@ -110,6 +110,15 @@ class TicketMovimientos extends ResourceController
         ];
 
         if ($this->model->insert($data)) {
+            // Resetear checks si el que escribe NO es el responsable
+            // Para que le salte la alerta "no leído" al responsable
+            if ($ticket['responsable_id'] && $ticket['responsable_id'] != session()->get('id')) {
+                $ticketModel->update($ticketId, [
+                    'visto_responsable_at' => null,
+                    'leido_responsable_at' => null
+                ]);
+            }
+
             // Notificamos
             $ticketModel = new TicketModel();
             $notificationModel = new NotificationModel();

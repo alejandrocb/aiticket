@@ -100,6 +100,26 @@
                             <span class="text-xs font-medium text-[#111418] dark:text-white">
                                 <?= $ticket['responsable_nombre'] ? esc($ticket['responsable_nombre']) : 'Sin Asignar' ?>
                             </span>
+                            <?php if($ticket['responsable_id']): ?>
+                                <?php 
+                                    $checkIcon = 'check'; 
+                                    $checkColor = 'text-gray-400';
+                                    $checkTitle = 'No visto aún';
+
+                                    if (!empty($ticket['leido_responsable_at'])) {
+                                        $checkIcon = 'done_all';
+                                        $checkColor = 'text-blue-500';
+                                        $checkTitle = 'Leído: ' . date('d/m H:i', strtotime($ticket['leido_responsable_at']));
+                                    } elseif (!empty($ticket['visto_responsable_at'])) {
+                                        $checkIcon = 'check'; // Cambio a check azul para diferenciar
+                                        $checkColor = 'text-blue-500';
+                                        $checkTitle = 'Visto en lista: ' . date('d/m H:i', strtotime($ticket['visto_responsable_at']));
+                                    }
+                                ?>
+                                <span class="material-symbols-outlined text-[16px] <?= $checkColor ?> ml-0.5" title="<?= $checkTitle ?>">
+                                    <?= $checkIcon ?>
+                                </span>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
