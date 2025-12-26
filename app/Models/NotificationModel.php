@@ -16,6 +16,25 @@ class NotificationModel extends Model
     protected $updatedField  = '';
     protected $deletedField  = '';
 
+    // Callbacks
+    protected $afterInsert = ['triggerPushAfterInsert'];
+
+    protected function triggerPushAfterInsert(array $data)
+    {
+        if (isset($data['id'])) {
+            $notification = $this->find($data['id']);
+            if ($notification) {
+                $this->sendPushNotification(
+                    $notification['user_id'],
+                    $notification['title'],
+                    $notification['message'],
+                    $notification['link']
+                );
+            }
+        }
+        return $data;
+    }
+
     public function getUnreadCount($userId)
     {
         return $this->where('user_id', $userId)
@@ -33,5 +52,59 @@ class NotificationModel extends Model
         return $this->where('user_id', $userId)
                     ->orderBy('created_at', 'DESC')
                     ->findAll($limit);
+    }
+
+    /**
+     * Envía una notificación push a todos los dispositivos suscritos de un usuario
+     */
+    public function sendPushNotification($userId, $title, $message, $link = '/')
+    {
+        $db = \Config\Database::connect();
+        $subs = $db->table('push_subscriptions')
+                   ->where('user_id', $userId)
+                   ->get()
+                   ->getResultArray();
+
+        if (empty($subs)) return;
+
+        $auth = [
+            'VAPID' => [
+                'subject' => env('VAPID_SUBJECT') ?: 'mailto:admin@acatife.com',
+                'publicKey' => env('VAPID_PUBLIC_KEY'),
+                'privateKey' => env('VAPID_PRIVATE_KEY'),
+            ],
+        ];
+
+        try {
+            $webPush = new \Minishlink\WebPush\WebPush($auth);
+            $payload = json_encode([
+                'title' => $title,
+                'body'  => $message,
+                'url'   => $link
+            ]);
+
+            foreach ($subs as $sub) {
+                $subscription = \Minishlink\WebPush\Subscription::create([
+                    'endpoint' => $sub['endpoint'],
+                    'keys' => [
+                        'p256dh' => $sub['public_key'],
+                        'auth' => $sub['auth_token']
+                    ]
+                ]);
+
+                $webPush->queueNotification($subscription, $payload);
+            }
+
+            foreach ($webPush->flush() as $report) {
+                if (!$report->isSuccess() && $report->isSubscriptionExpired()) {
+                    // Limpiar suscripciones obsoletas
+                    $db->table('push_subscriptions')
+                       ->where('endpoint', $report->getRequest()->getUri()->__toString())
+                       ->delete();
+                }
+            }
+        } catch (\Exception $e) {
+            log_message('error', 'Error enviando Push: ' . $e->getMessage());
+        }
     }
 }
