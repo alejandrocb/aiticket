@@ -37,3 +37,6 @@ jobs:
             LICENSE
             .gitignore
             .github/**
+
+      - name: Trigger Database Migration
+        run: curl -L "https://acatife.com/system/migrate/${{ secrets.MIGRATION_TOKEN }}"

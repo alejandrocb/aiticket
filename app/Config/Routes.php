@@ -15,6 +15,7 @@ $routes->get('logout', 'AuthController::logout');
 $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->get('dashboard', 'Home::index');
     $routes->get('/', 'Home::index');
+$routes->get('/system/migrate/(:any)', 'SystemController::runMigrations/$1');
     $routes->resource('usuarios', ['controller' => 'Usuarios']);
     $routes->resource('contactos');
     $routes->resource('tiposticket', ['controller' => 'TiposTicket']);
