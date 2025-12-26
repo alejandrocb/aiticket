@@ -24,7 +24,9 @@ class TicketModel extends Model
         'responsable_id',
         'escenario_id',
         'media',
-        'fecha_inicio_publicacion'
+        'fecha_inicio_publicacion',
+        'visto_responsable_at',
+        'leido_responsable_at'
     ];
 
     protected $useTimestamps = false;
@@ -89,7 +91,9 @@ class TicketModel extends Model
                       COALESCE(ultimo_movimiento.fecha_movimiento, tickets.fecha_creacion) as fecha_relevante,
                       ultimo_movimiento.descripcion as ultimo_movimiento,
                       ultimo_movimiento.fecha_movimiento as fecha_ultimo_movimiento,
-                      ultimo_movimiento.imagen as imagen_ultimo_movimiento')
+                      ultimo_movimiento.imagen as imagen_ultimo_movimiento,
+                      tickets.visto_responsable_at,
+                      tickets.leido_responsable_at')
             ->join('clientes', 'clientes.id = tickets.cliente_id')
             ->join('estados_ticket', 'estados_ticket.id = tickets.estado_ticket_id')
             ->join('tipos_ticket', 'tipos_ticket.id = tickets.tipo_ticket_id')
@@ -139,7 +143,9 @@ class TicketModel extends Model
                               ticket_movimientos.descripcion as ultimo_movimiento,
                               ticket_movimientos.fecha_movimiento as fecha_ultimo_movimiento,
                               ticket_movimientos.imagen as imagen_ultimo_movimiento,
-                              ticket_movimientos.auto as auto_ultimo_movimiento')
+                              ticket_movimientos.auto as auto_ultimo_movimiento,
+                              tickets.visto_responsable_at,
+                              tickets.leido_responsable_at')
                     ->join('clientes', 'clientes.id = tickets.cliente_id')
                     ->join('estados_ticket', 'estados_ticket.id = tickets.estado_ticket_id')
                     ->join('tipos_ticket', 'tipos_ticket.id = tickets.tipo_ticket_id')
