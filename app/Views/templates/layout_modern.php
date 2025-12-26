@@ -86,12 +86,6 @@
                 <span class="text-sm font-medium">Reportes</span>
             </a>
         </nav>
-        <div class="p-4 border-t border-[#e5e7eb] dark:border-[#283039]">
-            <button class="flex items-center gap-3 w-full px-3 py-2 text-text-secondary hover:text-[#111418] dark:hover:text-white hover:bg-gray-100 dark:hover:bg-[#2c3b4a] rounded-xl transition-colors">
-                <div class="h-6 w-6 rounded-full bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDnDQpiODsqGs8p2ABwphK9A97hhZFah0pgGh7x6Uvw1ebRamKOBTnXBFgzPjCE_06miHRtm8NspJxj50xa3HCgOeNWWIn-RNMtOdLfX78W7DMtay9TWML4hU2hX7OzRL94ttCc1geP0pTKuGY9sJz7BghpR_tEHYZtkBWrxr8YrzsxFTzvu-kjIb9e0H9M2k2xPres1F8Vfdayt3SKUCjAzBhePrKkbD2_efnCm7i11yZMJUrHO_SHimiL9xt7LJLRjXbnJOZvK2g");'></div>
-                <span class="text-sm font-medium">Perfil</span>
-            </button>
-        </div>
     </div>
 
     <!-- Main Content -->
@@ -126,6 +120,23 @@
                     <a href="<?= base_url('tickets/crear') ?>" class="flex items-center justify-center rounded-lg h-10 w-10 bg-primary text-white shadow-lg shadow-primary/30 hover:bg-primary/90 transition-colors">
                         <span class="material-symbols-outlined">add</span>
                     </a>
+
+                    <!-- User Profile Button -->
+                    <div class="flex items-center gap-3 ml-1 pl-3 border-l border-slate-200 dark:border-slate-800">
+                        <div class="hidden md:flex flex-col items-end">
+                            <span class="text-sm font-semibold text-slate-900 dark:text-white leading-none mb-1"><?= session()->get('nombre') ?></span>
+                            <span class="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider">Mi Perfil</span>
+                        </div>
+                        <a href="<?= base_url('profile') ?>" class="relative group h-10 w-10 rounded-full border-2 border-white dark:border-slate-800 shadow-sm group-hover:border-primary transition-all overflow-hidden flex items-center justify-center bg-primary/10 text-primary">
+                            <!-- Initials (Underlay) -->
+                            <span class="font-bold text-sm"><?= strtoupper(substr(session()->get('nombre'), 0, 2)) ?></span>
+                            
+                            <!-- Image (Overlay) -->
+                            <?php if (session()->get('imagen')): ?>
+                                <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<?= base_url(session()->get('imagen')) ?>')"></div>
+                            <?php endif; ?>
+                        </a>
+                    </div>
                 </div>
             </div>
             <!-- Dynamic Sub-header/Filters (Optional, can be passed from view) -->

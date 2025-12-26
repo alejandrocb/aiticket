@@ -34,7 +34,9 @@
     <div class="px-5 mb-4 flex flex-col gap-3">
         <div class="bg-surface-light dark:bg-surface-dark rounded-xl p-3 shadow-sm border border-slate-200 dark:border-slate-800/60 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="bg-center bg-no-repeat bg-cover rounded-full h-10 w-10 ring-2 ring-slate-100 dark:ring-slate-700" style='background-image: url("https://ui-avatars.com/api/?name=<?= urlencode($cliente_nombre) ?>&background=random");'></div>
+                <div class="bg-primary/10 text-primary flex items-center justify-center rounded-full h-10 w-10 ring-2 ring-slate-100 dark:ring-slate-700 font-bold text-sm">
+                    <?= strtoupper(substr($cliente_nombre, 0, 2)) ?>
+                </div>
                 <div>
                     <p class="text-slate-500 dark:text-slate-400 text-[10px] uppercase font-semibold tracking-wider mb-0.5">Cliente</p>
                     <p class="text-slate-900 dark:text-white text-sm font-bold"><?= $cliente_nombre ?></p>
@@ -46,7 +48,15 @@
             <div class="bg-surface-light dark:bg-surface-dark rounded-xl p-3 shadow-sm border border-slate-200 dark:border-slate-800/60">
                 <p class="text-slate-500 dark:text-slate-400 text-[10px] uppercase font-semibold tracking-wider mb-2">Responsable</p>
                 <div class="flex items-center gap-2">
-                    <div class="bg-center bg-no-repeat bg-cover rounded-full h-6 w-6 ring-1 ring-slate-200 dark:ring-slate-700" style='background-image: url("<?= $responsable_imagen ?: 'https://ui-avatars.com/api/?name='.urlencode($responsable_nombre) ?>");'></div>
+                    <div class="h-6 w-6 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-[10px] ring-1 ring-slate-200 dark:ring-slate-700 relative overflow-hidden">
+                         <!-- Initials Fallback -->
+                         <span><?= $responsable_nombre ? strtoupper(substr($responsable_nombre, 0, 2)) : 'NA' ?></span>
+                         
+                         <!-- Image Overlay -->
+                         <?php if ($responsable_imagen): ?>
+                            <div class="absolute inset-0 bg-center bg-no-repeat bg-cover" style='background-image: url("<?= base_url($responsable_imagen) ?>");'></div>
+                         <?php endif; ?>
+                    </div>
                     <p class="text-slate-900 dark:text-white text-xs font-bold truncate"><?= $responsable_nombre ?: 'Sin Asignar' ?></p>
                 </div>
             </div>
@@ -77,9 +87,15 @@
             <?php if (!empty($movimientos)): ?>
                 <?php foreach (array_slice($movimientos, 0, 3) as $movimiento): ?>
                     <div class="relative flex gap-4 pb-8 group">
-                         <div class="z-10 flex-shrink-0 size-8 mt-1 rounded-full bg-primary flex items-center justify-center ring-4 ring-background-light dark:ring-background-dark">
-                            <span class="material-symbols-outlined text-white text-[16px]">comment</span>
-                        </div>
+                         <div class="z-10 flex-shrink-0 size-8 mt-1 rounded-full bg-primary/10 text-primary flex items-center justify-center ring-4 ring-background-light dark:ring-background-dark font-bold text-xs border border-primary/20 relative overflow-hidden">
+                            <!-- Initials Fallback -->
+                            <span><?= strtoupper(substr($movimiento['usuario_nombre'], 0, 2)) ?></span>
+                            
+                            <!-- Image Overlay -->
+                            <?php if ($movimiento['usuario_imagen']): ?>
+                                <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<?= base_url($movimiento['usuario_imagen']) ?>')"></div>
+                            <?php endif; ?>
+                         </div>
                         <div class="flex-1">
                             <div class="flex items-baseline justify-between mb-1">
                                 <p class="text-slate-900 dark:text-white text-sm font-semibold"><?= $movimiento['usuario_nombre'] ?></p>
