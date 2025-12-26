@@ -29,7 +29,15 @@
                     </div>
 
                     <div class="flex items-center gap-2 mt-2">
-                        <div class="w-5 h-5 rounded-full bg-indigo-500 flex items-center justify-center text-[10px] text-white font-bold">U</div>
+                        <div class="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[10px] font-bold border border-primary/20 relative overflow-hidden shadow-sm">
+                            <!-- Initials Fallback -->
+                            <span><?= strtoupper(substr($movimiento['usuario_nombre'], 0, 2)) ?></span>
+                            
+                            <!-- Image Overlay -->
+                            <?php if ($movimiento['usuario_imagen']): ?>
+                                <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<?= base_url($movimiento['usuario_imagen']) ?>')"></div>
+                            <?php endif; ?>
+                        </div>
                         <p class="text-sm text-gray-500 dark:text-gray-400">Por <span class="text-gray-700 dark:text-gray-300 font-medium"><?= $movimiento['usuario_nombre'] ?></span></p>
                     </div>
                 </div>

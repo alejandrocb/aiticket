@@ -66,4 +66,7 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     
     // Ruta de Perfil
     $routes->get('profile', 'Profile::index');
+    $routes->post('profile/update', 'Profile::update');
+    $routes->post('profile/updatePassword', 'Profile::updatePassword');
+    $routes->post('profile/updateAvatar', 'Profile::updateAvatar');
 });

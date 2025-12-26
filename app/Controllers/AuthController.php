@@ -27,6 +27,7 @@ class AuthController extends Controller
                 'nombre' => $user['nombre'],
                 'email' => $user['email'],
                 'rol_id' => $user['tipo_usuario_id'],
+                'imagen' => $user['imagen'],
                 'isLoggedIn' => true,
             ];
             $session->set($ses_data);

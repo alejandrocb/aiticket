@@ -93,9 +93,15 @@
                     </div>
                     <div class="flex items-center gap-2">
                         <span class="text-xs text-text-secondary font-medium">Agente:</span>
-                        <div class="flex items-center gap-2 bg-background-light dark:bg-background-dark/50 pr-3 pl-1 py-1 rounded-full">
-                            <div class="h-5 w-5 rounded-full bg-gray-400 flex items-center justify-center text-[10px] text-white font-bold">
-                                <?= $ticket['responsable_nombre'] ? strtoupper(substr($ticket['responsable_nombre'], 0, 2)) : 'NA' ?>
+                        <div class="flex items-center gap-2 bg-background-light dark:bg-background-dark/50 pr-3 pl-1 py-1 rounded-full border border-slate-100 dark:border-slate-800">
+                            <div class="h-6 w-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[10px] font-bold border border-primary/20 relative overflow-hidden shadow-sm">
+                                <!-- Fallback Initials -->
+                                <span><?= $ticket['responsable_nombre'] ? strtoupper(substr($ticket['responsable_nombre'], 0, 2)) : 'NA' ?></span>
+                                
+                                <!-- Overlay Image -->
+                                <?php if ($ticket['responsable_imagen']): ?>
+                                    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<?= base_url($ticket['responsable_imagen']) ?>')"></div>
+                                <?php endif; ?>
                             </div>
                             <span class="text-xs font-medium text-[#111418] dark:text-white">
                                 <?= $ticket['responsable_nombre'] ? esc($ticket['responsable_nombre']) : 'Sin Asignar' ?>
