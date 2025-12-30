@@ -119,6 +119,11 @@
                 Activar Notificaciones
             </button>
 
+            <button type="button" onclick="PushHandler.resetSystem()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold h-11 rounded-lg transition-all flex items-center justify-center gap-2 mb-3 text-sm">
+                <span class="material-symbols-outlined text-[18px]">refresh</span>
+                Resetear Sistema
+            </button>
+
             <!-- Debug Console for Mobile -->
             <div class="mt-4">
                 <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1 ml-1">Estado del Sistema</p>
