@@ -7,7 +7,7 @@
     <title><?= $title ?? 'Panel de Tickets'; ?></title>
     
     <!-- PWA Meta Tags -->
-    <link rel="manifest" href="<?= base_url('manifest.json') ?>">
+    <link rel="manifest" href="<?= base_url('manifest.json?v=' . time()) ?>">
     <meta name="theme-color" content="#137fec">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -250,18 +250,23 @@
     });
 </script>
     <!-- Push Notifications -->
-    <script src="<?= base_url('assets/js/push-handler.js') ?>"></script>
+    <script src="<?= base_url('assets/js/push-handler.js?v=' . time()) ?>"></script>
     <script>
+        console.log("Aiticket: Cargando scripts de Push...");
         document.addEventListener('DOMContentLoaded', function() {
+            console.log("Aiticket: DOM Cargado, inicializando Push...");
             const vapidKey = '<?= env('VAPID_PUBLIC_KEY') ?>';
-            console.log("VAPID Key detectada:", vapidKey ? "SI" : "NO");
-            if (vapidKey) {
-                PushHandler.init(vapidKey, '<?= base_url() ?>');
-            } else {
-                console.warn("No se pudo iniciar PushHandler: VAPID_PUBLIC_KEY no encontrada en el .env");
-                if (typeof PushHandler !== 'undefined') {
-                    PushHandler.log('Error: Llave VAPID no encontrada en el servidor.');
+            
+            if (typeof PushHandler !== 'undefined') {
+                PushHandler.log('Aiticket: Sistema iniciado.');
+                if (vapidKey) {
+                    PushHandler.init(vapidKey, '<?= base_url() ?>');
+                } else {
+                    PushHandler.log('Error: VAPID Key no encontrada.');
                 }
+            } else {
+                console.error("Aiticket: PushHandler NO está definido.");
+                alert("Error crítico: El controlador de notificaciones no cargó.");
             }
         });
     </script>
