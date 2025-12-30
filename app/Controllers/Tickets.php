@@ -173,6 +173,7 @@ class Tickets extends Controller
                     'title'      => 'Nuevo Ticket Asignado',
                     'message'    => "Se te ha asignado el ticket #{$ticketId}.",
                     'link'       => "/tickets/detail/{$ticketId}",
+                    'icon'       => session()->get('imagen'),
                     'created_at' => date('Y-m-d H:i:s')
                 ]);
             }
@@ -229,6 +230,7 @@ class Tickets extends Controller
                 'title' => 'Ticket Actualizado',
                 'message' => "El ticket #{$id} ha sido actualizado.",
                 'link' => "/tickets/detail/{$id}",
+                'icon' => session()->get('imagen'),
                 'created_at' => date('Y-m-d H:i:s')
             ]);
         }

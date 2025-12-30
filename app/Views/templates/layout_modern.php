@@ -219,15 +219,24 @@
                             const isReadClass = notif.is_read == 1 ? 'opacity-60' : 'bg-blue-50/50 dark:bg-blue-900/10';
                             const link = notif.link ? `href="${notif.link}"` : '#';
                             
+                            // Avatar logic
+                            let avatarHtml = '';
+                            if (notif.icon) {
+                                avatarHtml = `<div class="h-8 w-8 rounded-full bg-slate-100 dark:bg-slate-800 bg-cover bg-center shrink-0 border border-slate-200 dark:border-slate-700" style="background-image: url('<?= base_url() ?>${notif.icon}')"></div>`;
+                            } else {
+                                avatarHtml = `<div class="h-8 w-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0 border border-primary/20">${notif.title.substring(0,1)}</div>`;
+                            }
+
                             const html = `
                                 <a ${link} class="block p-3 border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors ${isReadClass}" onclick="markAsRead(${notif.id})">
                                     <div class="flex gap-3">
-                                        <div class="mt-1 h-2 w-2 rounded-full ${notif.is_read == 0 ? 'bg-primary' : 'bg-transparent'} shrink-0"></div>
-                                        <div>
-                                            <p class="text-sm font-medium text-slate-900 dark:text-white leading-tight mb-1">${notif.title}</p>
-                                            <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">${notif.message}</p>
+                                        ${avatarHtml}
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-sm font-medium text-slate-900 dark:text-white leading-tight mb-1 truncate">${notif.title}</p>
+                                            <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-tight">${notif.message}</p>
                                             <span class="text-[10px] text-slate-400 mt-1 block">${notif.created_at}</span>
                                         </div>
+                                        <div class="mt-1 h-2 w-2 rounded-full ${notif.is_read == 0 ? 'bg-primary' : 'bg-transparent'} shrink-0"></div>
                                     </div>
                                 </a>
                             `;

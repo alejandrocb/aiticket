@@ -148,6 +148,7 @@ class TicketMovimientos extends ResourceController
                         'title' => $notifTitle,
                         'message' => $notifMessage,
                         'link' => "/tickets/detail/{$ticketId}",
+                        'icon' => session()->get('imagen'),
                         'created_at' => date('Y-m-d H:i:s')
                     ]);
                 }
