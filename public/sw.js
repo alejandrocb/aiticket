@@ -1,11 +1,11 @@
 // sw.js - Service Worker for Aiticket
-const CACHE_NAME = 'aiticket-v1';
+const CACHE_NAME = 'aiticket-v2';
 const ASSETS_TO_CACHE = [
-    '/',
-    '/dashboard',
-    '/assets/images/icon-192.png',
-    '/assets/images/icon-512.png',
-    '/favicon.ico'
+    './',
+    'dashboard',
+    'assets/images/icon-192.png',
+    'assets/images/icon-512.png',
+    'favicon.ico'
 ];
 
 // Install Event
@@ -36,10 +36,10 @@ self.addEventListener('push', function (event) {
     const title = data.title || 'Aiticket';
     const options = {
         body: data.body || 'Tienes una nueva notificación.',
-        icon: '/assets/images/icon-192.png',
-        badge: '/assets/images/icon-192.png',
+        icon: 'assets/images/icon-192.png',
+        badge: 'assets/images/icon-192.png',
         data: {
-            url: data.url || '/'
+            url: data.url || './'
         }
     };
 
