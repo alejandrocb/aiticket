@@ -102,6 +102,31 @@
                 Actualizar Contraseña
             </button>
         </form>
+    <div class="px-4 mt-8">
+        <div class="p-4 bg-white dark:bg-surface-dark border border-gray-200 dark:border-surface-border rounded-lg">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-500/10 text-blue-500">
+                    <span class="material-symbols-outlined text-[20px]">notifications_active</span>
+                </div>
+                <div>
+                    <span class="text-base font-medium dark:text-white block">Centro de Notificaciones</span>
+                    <span class="text-xs text-text-secondary block">Configura las alertas push</span>
+                </div>
+            </div>
+
+            <button type="button" onclick="PushHandler.requestSubscription()" class="w-full bg-primary hover:bg-blue-600 text-white font-bold h-11 rounded-lg transition-all shadow-sm flex items-center justify-center gap-2 mb-3">
+                <span class="material-symbols-outlined text-[20px]">send</span>
+                Activar Notificaciones
+            </button>
+
+            <!-- Debug Console for Mobile -->
+            <div class="mt-4">
+                <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1 ml-1">Estado del Sistema</p>
+                <div id="push-debug-log" class="text-[10px] font-mono p-3 bg-slate-50 dark:bg-black/20 border border-slate-100 dark:border-slate-800 rounded-md max-h-32 overflow-y-auto text-slate-500 dark:text-slate-400 leading-tight">
+                    Esperando interacción...
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="px-4 mt-10 mb-6">
