@@ -1,8 +1,7 @@
 // sw.js - Service Worker for Aiticket
-const CACHE_NAME = 'aiticket-v3';
+const CACHE_NAME = 'aiticket-v4';
 const ASSETS_TO_CACHE = [
     './',
-    'dashboard',
     'assets/images/icon-192.png',
     'assets/images/icon-512.png',
     'favicon.ico'

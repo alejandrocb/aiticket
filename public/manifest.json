@@ -2,7 +2,7 @@
     "name": "Aiticket - Soporte Técnico",
     "short_name": "Aiticket",
     "description": "Gestión de tickets de soporte técnico y notificaciones en tiempo real.",
-    "start_url": "dashboard",
+    "start_url": "./dashboard",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#137fec",
