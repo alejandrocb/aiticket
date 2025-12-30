@@ -80,13 +80,14 @@ class NotificationModel extends Model
             $webPush = new \Minishlink\WebPush\WebPush($auth);
             
             // Convert icon to absolute URL if it exists
-            $iconUrl = $icon ? base_url($icon) : base_url('assets/images/icon-192.png');
+            $userPhotoUrl = $icon ? base_url($icon) : null;
 
             $payload = json_encode([
                 'title' => $title,
                 'body'  => $message,
                 'url'   => $link,
-                'icon'  => $iconUrl
+                'userPhoto' => $userPhotoUrl,
+                'tag'   => 'ticket-' . uniqid()
             ]);
 
             foreach ($subs as $sub) {
