@@ -254,8 +254,14 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const vapidKey = '<?= env('VAPID_PUBLIC_KEY') ?>';
+            console.log("VAPID Key detectada:", vapidKey ? "SI" : "NO");
             if (vapidKey) {
                 PushHandler.init(vapidKey, '<?= base_url() ?>');
+            } else {
+                console.warn("No se pudo iniciar PushHandler: VAPID_PUBLIC_KEY no encontrada en el .env");
+                if (typeof PushHandler !== 'undefined') {
+                    PushHandler.log('Error: Llave VAPID no encontrada en el servidor.');
+                }
             }
         });
     </script>
