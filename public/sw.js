@@ -1,5 +1,5 @@
 // sw.js - Service Worker for Aiticket
-const CACHE_NAME = 'aiticket-v2';
+const CACHE_NAME = 'aiticket-v3';
 const ASSETS_TO_CACHE = [
     './',
     'dashboard',
@@ -36,7 +36,7 @@ self.addEventListener('push', function (event) {
     const title = data.title || 'Aiticket';
     const options = {
         body: data.body || 'Tienes una nueva notificación.',
-        icon: 'assets/images/icon-192.png',
+        icon: data.icon || 'assets/images/icon-192.png',
         badge: 'assets/images/icon-192.png',
         data: {
             url: data.url || './'
