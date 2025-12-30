@@ -1,5 +1,5 @@
 // sw.js - Service Worker for Aiticket
-const CACHE_NAME = 'aiticket-v5';
+const CACHE_NAME = 'aiticket-v6';
 const ASSETS_TO_CACHE = [
     './',
     'assets/images/icon-192.png',
@@ -36,12 +36,25 @@ self.addEventListener('push', function (event) {
     const title = data.title || 'Aiticket';
     const options = {
         body: data.body || 'Tienes una nueva notificación.',
-        icon: data.icon || 'assets/images/icon-192.png',
-        badge: 'assets/images/badge-white.png',
+        icon: 'assets/images/icon-192.png',  // Logo de la app (izquierda)
+        badge: 'assets/images/badge-white.png',  // Logo monocromo (esquina)
+        image: data.userPhoto || null,  // Foto del usuario (grande, visible)
         vibrate: [200, 100, 200],
+        tag: data.tag || 'aiticket-notification',
+        requireInteraction: false,
         data: {
             url: data.url || './'
-        }
+        },
+        actions: [
+            {
+                action: 'view',
+                title: '👁️ Ver',
+            },
+            {
+                action: 'close',
+                title: 'Cerrar',
+            }
+        ]
     };
 
     event.waitUntil(
@@ -51,8 +64,11 @@ self.addEventListener('push', function (event) {
 
 self.addEventListener('notificationclick', function (event) {
     event.notification.close();
-    event.waitUntil(
-        clients.openWindow(event.notification.data.url)
-    );
+
+    if (event.action === 'view' || !event.action) {
+        event.waitUntil(
+            clients.openWindow(event.notification.data.url)
+        );
+    }
 });
 
