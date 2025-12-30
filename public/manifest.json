@@ -2,19 +2,19 @@
     "name": "Aiticket - Soporte Técnico",
     "short_name": "Aiticket",
     "description": "Gestión de tickets de soporte técnico y notificaciones en tiempo real.",
-    "start_url": "/dashboard",
+    "start_url": "dashboard",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#137fec",
     "icons": [
         {
-            "src": "/assets/images/icon-192.png",
+            "src": "assets/images/icon-192.png",
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "any maskable"
         },
         {
-            "src": "/assets/images/icon-512.png",
+            "src": "assets/images/icon-512.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "any maskable"
