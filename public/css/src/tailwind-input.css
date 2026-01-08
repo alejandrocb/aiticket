@@ -34,8 +34,12 @@
 
     /* Fallback manual para el body si la utilidad de Tailwind falla */
     html.dark body {
-        background-color: #101922 !important;
-        color: #ffffff !important;
+        background-color: #101922;
+        color: #ffffff;
+    }
+
+    body {
+        @apply bg-background-light text-[#111418] dark:bg-background-dark dark:text-white transition-colors duration-200;
     }
 }
 

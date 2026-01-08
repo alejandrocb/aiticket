@@ -29,8 +29,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
     
     <!-- Tailwind CSS Compilado -->
-    <link rel="stylesheet" href="<?= base_url('css/tailwind.css') ?>">
-    <link rel="stylesheet" href="<?= base_url('css/app.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('css/tailwind.css?v=' . filemtime(FCPATH . 'css/tailwind.css')) ?>">
+    <link rel="stylesheet" href="<?= base_url('css/app.css?v=' . filemtime(FCPATH . 'css/app.css')) ?>">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-background-light dark:bg-background-dark text-[#111418] dark:text-white font-display overflow-x-hidden">
@@ -90,6 +90,13 @@
                 <h2 class="text-[#111418] dark:text-white text-2xl font-bold leading-tight tracking-[-0.015em] flex-1 md:hidden">Soporte</h2>
                 <h2 class="text-[#111418] dark:text-white text-2xl font-bold leading-tight tracking-[-0.015em] flex-1 hidden md:block"><?= $title ?? 'Dashboard'; ?></h2>
                 <div class="flex items-center justify-end gap-3">
+                <div class="flex items-center justify-end gap-3">
+                    <!-- Theme Toggle Button -->
+                    <button id="theme-toggle" onclick="toggleTheme(event)" class="flex items-center justify-center rounded-full h-10 w-10 bg-transparent text-[#111418] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
+                        <span id="theme-toggle-dark-icon" class="material-symbols-outlined hidden">dark_mode</span>
+                        <span id="theme-toggle-light-icon" class="material-symbols-outlined hidden">light_mode</span>
+                    </button>
+
                     <a href="<?= base_url('tickets/crear') ?>" class="flex items-center justify-center rounded-lg h-10 w-10 bg-primary text-white shadow-lg shadow-primary/30 hover:bg-primary/90 transition-colors">
                         <span class="material-symbols-outlined">add</span>
                     </a>
@@ -102,7 +109,7 @@
                         </div>
                         <a href="<?= base_url('profile') ?>" class="relative group h-10 w-10 rounded-full border-2 border-white dark:border-slate-800 shadow-sm group-hover:border-primary transition-all overflow-hidden flex items-center justify-center bg-primary/10 text-primary">
                             <!-- Initials (Underlay) -->
-                            <span class="font-bold text-sm"><?= strtoupper(substr(session()->get('nombre'), 0, 2)) ?></span>
+                            <span class="font-bold text-sm"><?= strtoupper(substr(session()->get('nombre') ?? '', 0, 2)) ?></span>
                             
                             <!-- Image (Overlay) -->
                             <?php if (session()->get('imagen')): ?>
@@ -162,7 +169,37 @@
     </div>
 </div>
 <script>
+    // Theme logic refinement
+    window.updateThemeIcons = function() {
+        const darkIcon = document.getElementById('theme-toggle-dark-icon');
+        const lightIcon = document.getElementById('theme-toggle-light-icon');
+        if (!darkIcon || !lightIcon) return;
+        
+        if (document.documentElement.classList.contains('dark')) {
+            darkIcon.classList.remove('hidden');
+            lightIcon.classList.add('hidden');
+        } else {
+            darkIcon.classList.add('hidden');
+            lightIcon.classList.remove('hidden');
+        }
+    };
+
+    window.toggleTheme = function(e) {
+        if (e) e.preventDefault();
+        
+        if (document.documentElement.classList.contains('dark')) {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+        } else {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+        }
+        window.updateThemeIcons();
+    };
+
     document.addEventListener('DOMContentLoaded', () => {
+        window.updateThemeIcons();
+
         const btnNotif = document.getElementById('btn-notifications');
         const dropdown = document.getElementById('notifications-dropdown');
         const badge = document.getElementById('notif-badge');
@@ -240,48 +277,6 @@
         // Initial Load and Interval
         loadNotifications();
         setInterval(loadNotifications, 60000); // Check every minute
-
-        // Theme Toggle Logic (Global & Robust)
-        window.updateThemeIcons = function() {
-            const darkIcon = document.getElementById('theme-toggle-dark-icon');
-            const lightIcon = document.getElementById('theme-toggle-light-icon');
-            if (!darkIcon || !lightIcon) return;
-            
-            if (document.documentElement.classList.contains('dark')) {
-                darkIcon.classList.add('hidden');
-                lightIcon.classList.remove('hidden');
-            } else {
-                darkIcon.classList.remove('hidden');
-                lightIcon.classList.add('hidden');
-            }
-        };
-
-        window.toggleTheme = function(e) {
-            if (e) e.preventDefault();
-            console.log("Aiticket: Cambiando tema...");
-            
-            try {
-                if (document.documentElement.classList.contains('dark')) {
-                    document.documentElement.classList.remove('dark');
-                    localStorage.setItem('theme', 'light');
-                } else {
-                    document.documentElement.classList.add('dark');
-                    localStorage.setItem('theme', 'dark');
-                }
-            } catch (e) {
-                console.error("No se pudo guardar la preferencia de tema en localStorage:", e);
-                // Al menos cambiamos la clase para que funcione en la sesión actual
-                if (document.documentElement.classList.contains('dark')) {
-                    document.documentElement.classList.remove('dark');
-                } else {
-                    document.documentElement.classList.add('dark');
-                }
-            }
-            window.updateThemeIcons();
-        };
-
-        // Initial Icon Update
-        window.updateThemeIcons();
     });
 </script>
     <!-- Push Notifications -->
