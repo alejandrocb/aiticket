@@ -3,6 +3,9 @@
 @source "../../../app/Views/**/*.php";
 @source "../../js/**/*.js";
 
+/* Soporte para modo oscuro mediante la clase .dark en el <html> */
+@variant dark (&:where(.dark, .dark *));
+
 @theme {
     /* Colores Corporativos */
     --color-primary: #137fec;

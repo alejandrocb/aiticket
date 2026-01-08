@@ -1,7 +1,15 @@
 <!-- layout_modern.php -->
 <!DOCTYPE html>
-<html class="dark" lang="es">
+<html lang="es">
 <head>
+    <script>
+        // Anti-flash script: Aplicar el tema antes de que se renderice la página
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title><?= $title ?? 'Panel de Tickets'; ?></title>
@@ -88,6 +96,12 @@
 
                     <!-- User Profile Button -->
                     <div class="flex items-center gap-3 ml-1 pl-3 border-l border-slate-200 dark:border-slate-800">
+                        <!-- Theme Toggle Button -->
+                        <button id="theme-toggle" class="flex items-center justify-center h-10 w-10 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mr-1">
+                            <span id="theme-toggle-dark-icon" class="hidden material-symbols-outlined">dark_mode</span>
+                            <span id="theme-toggle-light-icon" class="hidden material-symbols-outlined">light_mode</span>
+                        </button>
+
                         <div class="hidden md:flex flex-col items-end">
                             <span class="text-sm font-semibold text-slate-900 dark:text-white leading-none mb-1"><?= session()->get('nombre') ?></span>
                             <span class="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider">Mi Perfil</span>
@@ -232,6 +246,34 @@
         // Initial Load and Interval
         loadNotifications();
         setInterval(loadNotifications, 60000); // Check every minute
+
+        // Theme Toggle Logic
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const darkIcon = document.getElementById('theme-toggle-dark-icon');
+        const lightIcon = document.getElementById('theme-toggle-light-icon');
+
+        function updateIcons() {
+            if (document.documentElement.classList.contains('dark')) {
+                darkIcon.classList.add('hidden');
+                lightIcon.classList.remove('hidden');
+            } else {
+                darkIcon.classList.remove('hidden');
+                lightIcon.classList.add('hidden');
+            }
+        }
+
+        updateIcons();
+
+        themeToggleBtn.addEventListener('click', () => {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+            updateIcons();
+        });
     });
 </script>
     <!-- Push Notifications -->
