@@ -163,11 +163,19 @@ class TicketMovimientos extends ResourceController
             return $uid && $uid != $currentUserId;
         });
 
+        // Construir mensaje preciso
+        $message = "Actualización en el ticket #{$ticketId}";
+        if ($descripcionUsuario) {
+            $message = $descripcionUsuario;
+        } elseif (!empty($mediaFiles)) {
+            $message = "Se han añadido archivos adjuntos";
+        }
+
         foreach ($recipients as $recipientId) {
             $notificationModel->insert([
                 'user_id' => $recipientId,
                 'title' => 'Actualización de Ticket',
-                'message' => $descripcionUsuario ?: 'Se ha añadido contenido multimedia',
+                'message' => $message,
                 'link' => "/tickets/detail/{$ticketId}",
                 'icon' => session()->get('imagen'),
                 'image' => $firstImage,
