@@ -90,13 +90,6 @@
                 <h2 class="text-[#111418] dark:text-white text-2xl font-bold leading-tight tracking-[-0.015em] flex-1 md:hidden">Soporte</h2>
                 <h2 class="text-[#111418] dark:text-white text-2xl font-bold leading-tight tracking-[-0.015em] flex-1 hidden md:block"><?= $title ?? 'Dashboard'; ?></h2>
                 <div class="flex items-center justify-end gap-3">
-                <div class="flex items-center justify-end gap-3">
-                    <!-- Theme Toggle Button -->
-                    <button id="theme-toggle" onclick="toggleTheme(event)" class="flex items-center justify-center rounded-full h-10 w-10 bg-transparent text-[#111418] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
-                        <span id="theme-toggle-dark-icon" class="material-symbols-outlined hidden">dark_mode</span>
-                        <span id="theme-toggle-light-icon" class="material-symbols-outlined hidden">light_mode</span>
-                    </button>
-
                     <a href="<?= base_url('tickets/crear') ?>" class="flex items-center justify-center rounded-lg h-10 w-10 bg-primary text-white shadow-lg shadow-primary/30 hover:bg-primary/90 transition-colors">
                         <span class="material-symbols-outlined">add</span>
                     </a>
