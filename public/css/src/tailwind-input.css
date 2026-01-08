@@ -3,9 +3,6 @@
 @source "../../../app/Views/**/*.php";
 @source "../../js/**/*.js";
 
-/* Soporte para modo oscuro mediante la clase .dark en el <html> */
-@variant dark (&:where(.dark, .dark *));
-
 @theme {
     /* Colores Corporativos */
     --color-primary: #137fec;
@@ -23,6 +20,23 @@
     --radius-lg: 0.5rem;
     --radius-xl: 0.75rem;
     --radius-full: 9999px;
+}
+
+/* Activación manual de la variante dark para v4 (soporte clase .dark) */
+@variant dark (&:where(.dark, .dark *));
+
+@layer base {
+
+    /* Asegura que el navegador sepa que estamos en modo oscuro para elementos nativos */
+    html.dark {
+        color-scheme: dark;
+    }
+
+    /* Fallback manual para el body si la utilidad de Tailwind falla */
+    html.dark body {
+        background-color: #101922 !important;
+        color: #ffffff !important;
+    }
 }
 
 /* Clases de utilidad personalizadas */
