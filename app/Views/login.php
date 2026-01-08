@@ -1,6 +1,14 @@
 <!DOCTYPE html>
-<html class="dark" lang="es">
+<html lang="es">
 <head>
+    <script>
+        // Anti-flash script: Aplicar el tema antes de que se renderice la página
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Soporte de Tickets - Iniciar Sesión / Registro</title>
@@ -8,8 +16,8 @@
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-    <link rel="stylesheet" href="<?= base_url('css/tailwind.css') ?>">
-    <link rel="stylesheet" href="<?= base_url('css/auth.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('css/tailwind.css?v=' . filemtime(FCPATH . 'css/tailwind.css')) ?>">
+    <link rel="stylesheet" href="<?= base_url('css/auth.css?v=' . filemtime(FCPATH . 'css/auth.css')) ?>">
 </head>
 <body class="bg-gray-50 dark:bg-background-dark font-display text-[#111418] dark:text-white antialiased overflow-x-hidden transition-colors duration-200">
 <div class="relative flex h-auto min-h-screen w-full flex-col max-w-md mx-auto shadow-2xl bg-surface-light dark:bg-surface-dark overflow-hidden">
