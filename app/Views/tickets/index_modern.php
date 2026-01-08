@@ -68,9 +68,31 @@
                             <p class="text-text-secondary text-xs font-normal">#Ticket-<?= $ticket['id'] ?> • <?= date('d/m/Y', strtotime($ticket['fecha_creacion'] ?? 'now')) ?></p>
                         </div>
                     </div>
-                    <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset <?= $priorityColor ?>">
-                        <?= esc($ticket['prioridad_ticket_nombre']) ?>
-                    </span>
+                    <div class="flex flex-col items-end gap-2">
+                        <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset <?= $priorityColor ?>">
+                            <?= esc($ticket['prioridad_ticket_nombre']) ?>
+                        </span>
+                        
+                        <?php 
+                            $mainMedia = json_decode($ticket['media'] ?? '[]', true);
+                            $lastMovMedia = json_decode($ticket['ultimo_movimiento_media'] ?? '[]', true);
+                            $galleryMedia = !empty($lastMovMedia) ? $lastMovMedia : $mainMedia;
+                        ?>
+                        
+                        <?php if (!empty($galleryMedia)): ?>
+                            <button type="button" 
+                                    class="gallery-trigger flex items-center justify-center bg-white dark:bg-slate-800 rounded-lg p-1.5 border border-slate-200 dark:border-slate-700 shadow-sm hover:bg-primary/10 hover:border-primary/30 transition-all group"
+                                    onclick="event.preventDefault(); event.stopPropagation(); openGallery(<?= htmlspecialchars(json_encode($galleryMedia)) ?>, '<?= $ticket['id'] ?>')"
+                            >
+                                <span class="material-symbols-outlined text-[20px] text-slate-400 group-hover:text-primary">images</span>
+                                <?php if (count($galleryMedia) > 1): ?>
+                                    <span class="absolute -top-1 -right-1 bg-primary text-white text-[9px] font-bold h-4 w-4 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-800">
+                                        <?= count($galleryMedia) ?>
+                                    </span>
+                                <?php endif; ?>
+                            </button>
+                        <?php endif; ?>
+                    </div>
                 </div>
                 <div>
                     <!-- Primary Description (Ticket Title/Desc) -->
@@ -79,7 +101,15 @@
                     <!-- Secondary Description (Last User Movement) -->
                     <?php if (!empty($ticket['ultimo_movimiento'])): ?>
                          <div class="flex items-center gap-2 mt-1">
-                            <span class="material-symbols-outlined text-xs text-text-secondary">chat</span>
+                            <?php 
+                                $movIcon = 'chat';
+                                if (($ticket['ultimo_movimiento_tipo'] ?? '') === 'Cambio de Estado') {
+                                    $movIcon = 'radio_button_checked';
+                                } elseif (($ticket['ultimo_movimiento_tipo'] ?? '') === 'Cambio de Responsable') {
+                                    $movIcon = 'person';
+                                }
+                            ?>
+                            <span class="material-symbols-outlined text-xs text-text-secondary"><?= $movIcon ?></span>
                             <p class="text-text-secondary text-sm font-medium leading-relaxed line-clamp-1 italic">"<?= esc($ticket['ultimo_movimiento']) ?>"</p>
                             <span class="text-[10px] text-text-secondary">• <?= date('d/m/Y', strtotime($ticket['fecha_ultimo_movimiento'])) ?></span>
                         </div>
@@ -227,13 +257,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // 2. Check Tab Filter
             let matchesTab = false;
-            const isClosed = closedStatuses.some(s => status.includes(s));
+            const isClosed = (status === 'cerrado' || status === 'cerrada' || status === 'finalizado' || status === 'finalizada');
 
             if (currentMode === 'open') {
-                // Show ONLY if NOT closed
                 matchesTab = !isClosed;
             } else if (currentMode === 'closed') {
-                // Show ONLY if IS closed
                 matchesTab = isClosed;
             }
 
@@ -245,5 +273,104 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // Modal Gallery logic
+    window.openGallery = function(media, ticketId) {
+        const modal = document.getElementById('gallery-modal');
+        const container = document.getElementById('gallery-content');
+        container.innerHTML = '';
+        
+        media.forEach((item, index) => {
+            const slide = document.createElement('div');
+            slide.className = 'gallery-slide hidden w-full h-full flex items-center justify-center';
+            if (index === 0) slide.classList.remove('hidden');
+            
+            const filePath = `<?= base_url('upload/tickets/') ?>${item.filename}`;
+            
+            if (item.type === 'image') {
+                const img = document.createElement('img');
+                img.src = filePath;
+                img.className = 'max-w-full max-h-full object-contain rounded-lg shadow-2xl';
+                slide.appendChild(img);
+            } else {
+                const video = document.createElement('video');
+                video.src = filePath;
+                video.controls = true;
+                video.className = 'max-w-full max-h-full rounded-lg shadow-2xl';
+                slide.appendChild(video);
+            }
+            container.appendChild(slide);
+        });
+
+        modal.dataset.currentIndex = 0;
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        
+        // Actualizar contador
+        updateGalleryCounter(0, media.length);
+        
+        // Show/Hide Nav Buttons
+        document.getElementById('gallery-prev').style.display = media.length > 1 ? 'flex' : 'none';
+        document.getElementById('gallery-next').style.display = media.length > 1 ? 'flex' : 'none';
+    };
+
+    window.closeGallery = function() {
+        const modal = document.getElementById('gallery-modal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    };
+
+    window.nextSlide = function(direction) {
+        const slides = document.querySelectorAll('.gallery-slide');
+        const modal = document.getElementById('gallery-modal');
+        let index = parseInt(modal.dataset.currentIndex);
+        
+        slides[index].classList.add('hidden');
+        index = (index + direction + slides.length) % slides.length;
+        slides[index].classList.remove('hidden');
+        
+        modal.dataset.currentIndex = index;
+        updateGalleryCounter(index, slides.length);
+    };
+
+    function updateGalleryCounter(current, total) {
+        document.getElementById('gallery-counter').textContent = `${current + 1} / ${total}`;
+    }
+
+    // Close on background click
+    document.getElementById('gallery-modal').addEventListener('click', function(e) {
+        if (e.target === this) closeGallery();
+    });
+
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (document.getElementById('gallery-modal').classList.contains('hidden')) return;
+        if (e.key === 'ArrowRight') nextSlide(1);
+        if (e.key === 'ArrowLeft') nextSlide(-1);
+        if (e.key === 'Escape') closeGallery();
+    });
 });
 </script>
+
+<!-- Gallery Modal Structure -->
+<div id="gallery-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/90 backdrop-blur-sm transition-opacity" data-current-index="0">
+    <div class="absolute top-5 right-5 z-[110]">
+        <button onclick="closeGallery()" class="text-white hover:text-primary transition-colors bg-white/10 rounded-full p-2">
+            <span class="material-symbols-outlined text-3xl">close</span>
+        </button>
+    </div>
+    
+    <div id="gallery-counter" class="absolute top-5 left-5 text-white bg-black/50 px-3 py-1 rounded-full text-sm font-bold z-[110]"></div>
+
+    <button id="gallery-prev" onclick="nextSlide(-1)" class="absolute left-4 top-1/2 -translate-y-1/2 text-white bg-white/10 hover:bg-white/20 rounded-full p-3 transition-all z-[110]">
+        <span class="material-symbols-outlined text-4xl">chevron_left</span>
+    </button>
+    
+    <div id="gallery-content" class="w-full h-full p-6 flex items-center justify-center pointer-events-none">
+        <!-- Slides get injected here -->
+    </div>
+
+    <button id="gallery-next" onclick="nextSlide(1)" class="absolute right-4 top-1/2 -translate-y-1/2 text-white bg-white/10 hover:bg-white/20 rounded-full p-3 transition-all z-[110]">
+        <span class="material-symbols-outlined text-4xl">chevron_right</span>
+    </button>
+</div>

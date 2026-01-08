@@ -71,6 +71,37 @@
             <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
                 <?= nl2br($ticket['descripcion']) ?>
             </p>
+
+            <?php if (!empty($ticket['media'])): ?>
+                <?php $media = json_decode($ticket['media'], true); ?>
+                <?php if ($media): ?>
+                    <div class="flex flex-wrap gap-2 mt-4">
+                        <?php foreach ($media as $item): ?>
+                            <?php if ($item['type'] === 'image'): ?>
+                                <?php 
+                                    $filePath = base_url('upload/tickets/' . $item['filename']);
+                                    $dirName = dirname($item['filename']);
+                                    $baseName = basename($item['filename']);
+                                    $thumbPath = ($dirName === '.') 
+                                        ? base_url('upload/tickets/thumbnails/' . $baseName) 
+                                        : base_url('upload/tickets/' . $dirName . '/thumbnails/' . $baseName);
+                                ?>
+                                <a href="<?= $filePath ?>" target="_blank" class="block group relative">
+                                    <img src="<?= $thumbPath ?>" alt="Adjunto" class="h-20 w-20 object-cover rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm transition-transform group-hover:scale-105">
+                                    <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 rounded-lg flex items-center justify-center transition-opacity text-white">
+                                        <span class="material-symbols-outlined text-[18px]">zoom_in</span>
+                                    </div>
+                                </a>
+                            <?php else: ?>
+                                <a href="<?= base_url('upload/tickets/' . $item['filename']) ?>" target="_blank" class="flex flex-col items-center justify-center h-20 w-20 bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-primary transition-colors">
+                                    <span class="material-symbols-outlined text-[30px]">videocam</span>
+                                    <span class="text-[10px] uppercase font-bold">Video</span>
+                                </a>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -103,6 +134,37 @@
                             </div>
                             <div class="bg-surface-light dark:bg-surface-dark p-3 rounded-lg rounded-tl-none border border-slate-200 dark:border-slate-800/60 shadow-sm">
                                 <p class="text-slate-600 dark:text-slate-300 text-sm"><?= $movimiento['descripcion'] ?></p>
+                                
+                                <?php if (!empty($movimiento['media'])): ?>
+                                    <?php $media = json_decode($movimiento['media'], true); ?>
+                                    <?php if ($media): ?>
+                                        <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+                                            <?php foreach ($media as $item): ?>
+                                                <?php if ($item['type'] === 'image'): ?>
+                                                    <?php 
+                                                        $filePath = base_url('upload/tickets/' . $item['filename']);
+                                                        $dirName = dirname($item['filename']);
+                                                        $baseName = basename($item['filename']);
+                                                        $thumbPath = ($dirName === '.') 
+                                                            ? base_url('upload/tickets/thumbnails/' . $baseName) 
+                                                            : base_url('upload/tickets/' . $dirName . '/thumbnails/' . $baseName);
+                                                    ?>
+                                                    <a href="<?= $filePath ?>" target="_blank" class="block group relative">
+                                                        <img src="<?= $thumbPath ?>" alt="Adjunto" class="h-16 w-16 object-cover rounded border border-slate-200 dark:border-slate-700 shadow-xs transition-transform group-hover:scale-105">
+                                                        <div class="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 rounded flex items-center justify-center transition-opacity text-white">
+                                                            <span class="material-symbols-outlined text-[16px]">visibility</span>
+                                                        </div>
+                                                    </a>
+                                                <?php else: ?>
+                                                    <a href="<?= base_url('upload/tickets/' . $item['filename']) ?>" target="_blank" class="flex flex-col items-center justify-center h-16 w-16 bg-slate-50 dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-primary transition-colors">
+                                                        <span class="material-symbols-outlined text-[24px]">movie</span>
+                                                        <span class="text-[8px] uppercase font-bold tracking-tighter">Video</span>
+                                                    </a>
+                                                <?php endif; ?>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    <?php endif; ?>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -159,19 +221,21 @@
 
             <textarea name="descripcion" class="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#1c2127] text-slate-900 dark:text-white min-h-[100px] p-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors" placeholder="Escribe tu respuesta o comentario aquí... (Opcional si cambias estado/responsable)"></textarea>
             
-            <div class="flex flex-col gap-2">
-                <label class="text-[#111418] dark:text-white text-base font-medium leading-normal">Adjuntos</label>
-                <div class="flex items-center justify-center w-full">
-                    <label for="detail-dropzone-file" class="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-300 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-700 hover:bg-slate-100 dark:border-slate-600 dark:hover:border-slate-500 dark:hover:bg-slate-600 transition-colors">
-                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                            <span class="material-symbols-outlined text-gray-500 dark:text-gray-400 text-3xl mb-2">cloud_upload</span>
-                            <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Haga clic para subir</span> o arrastre y suelte</p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Imágenes o Videos</p>
-                        </div>
-                        <input id="detail-dropzone-file" name="media[]" type="file" class="hidden" multiple />
-                    </label>
+                <div class="flex flex-col gap-2">
+                    <label class="text-[#111418] dark:text-white text-base font-medium leading-normal">Adjuntos</label>
+                    <div class="flex items-center justify-center w-full">
+                        <label for="detail-dropzone-file" class="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-300 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-700 hover:bg-slate-100 dark:border-slate-600 dark:hover:border-slate-500 dark:hover:bg-slate-600 transition-colors">
+                            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                <span class="material-symbols-outlined text-gray-500 dark:text-gray-400 text-3xl mb-2">cloud_upload</span>
+                                <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Haga clic para subir</span> o arrastre y suelte</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Imágenes o Videos</p>
+                            </div>
+                            <input id="detail-dropzone-file" name="media[]" type="file" class="hidden" multiple />
+                        </label>
+                    </div>
+                    <!-- Contenedor de Previsualización -->
+                    <div id="detail-file-preview" class="flex gap-2 flex-wrap mt-2"></div>
                 </div>
-            </div>
 
             <div class="flex justify-end">
                 <button type="submit" class="bg-primary hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors flex items-center gap-2">
@@ -189,3 +253,67 @@
         </a>
     </div>
 </div>
+
+<script>
+let detailSelectedFiles = [];
+
+document.getElementById('detail-dropzone-file').addEventListener('change', function(e) {
+    const files = Array.from(this.files);
+    
+    files.forEach(file => {
+        if (!detailSelectedFiles.some(f => f.name === file.name && f.size === file.size)) {
+            detailSelectedFiles.push(file);
+        }
+    });
+
+    renderDetailPreviews();
+    updateDetailInput();
+});
+
+function renderDetailPreviews() {
+    const preview = document.getElementById('detail-file-preview');
+    preview.innerHTML = '';
+    
+    detailSelectedFiles.forEach((file, index) => {
+        const container = document.createElement('div');
+        container.className = 'relative group w-20 h-20 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 shadow-sm';
+        
+        if (file.type.startsWith('image/')) {
+            const img = document.createElement('img');
+            img.className = 'w-full h-full object-cover';
+            const reader = new FileReader();
+            reader.onload = e => img.src = e.target.result;
+            reader.readAsDataURL(file);
+            container.appendChild(img);
+        } else {
+            const iconWrap = document.createElement('div');
+            iconWrap.className = 'w-full h-full flex flex-col items-center justify-center text-slate-400';
+            iconWrap.innerHTML = `
+                <span class="material-symbols-outlined text-2xl">description</span>
+                <span class="text-[8px] uppercase font-bold mt-1">${file.name.split('.').pop()}</span>
+            `;
+            container.appendChild(iconWrap);
+        }
+        
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md hover:bg-red-600';
+        removeBtn.innerHTML = '<span class="material-symbols-outlined text-[14px]">close</span>';
+        removeBtn.onclick = (e) => {
+            e.preventDefault();
+            detailSelectedFiles.splice(index, 1);
+            renderDetailPreviews();
+            updateDetailInput();
+        };
+        
+        container.appendChild(removeBtn);
+        preview.appendChild(container);
+    });
+}
+
+function updateDetailInput() {
+    const dt = new DataTransfer();
+    detailSelectedFiles.forEach(file => dt.items.add(file));
+    document.getElementById('detail-dropzone-file').files = dt.files;
+}
+</script>

@@ -26,6 +26,37 @@
                     
                     <div class="bg-gray-100 dark:bg-surface-dark border border-gray-200 dark:border-gray-700 rounded-md p-3 mt-2">
                         <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed"><?= $movimiento['descripcion'] ?></p>
+                        
+                        <?php if (!empty($movimiento['media'])): ?>
+                            <?php $media = json_decode($movimiento['media'], true); ?>
+                            <?php if ($media): ?>
+                                <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                                    <?php foreach ($media as $item): ?>
+                                        <?php if ($item['type'] === 'image'): ?>
+                                            <?php 
+                                                $filePath = base_url('upload/tickets/' . $item['filename']);
+                                                $dirName = dirname($item['filename']);
+                                                $baseName = basename($item['filename']);
+                                                $thumbPath = ($dirName === '.') 
+                                                    ? base_url('upload/tickets/thumbnails/' . $baseName) 
+                                                    : base_url('upload/tickets/' . $dirName . '/thumbnails/' . $baseName);
+                                            ?>
+                                            <a href="<?= $filePath ?>" target="_blank" class="block group relative">
+                                                <img src="<?= $thumbPath ?>" alt="Adjunto" class="h-14 w-14 object-cover rounded border border-gray-200 dark:border-gray-700 shadow-sm transition-transform group-hover:scale-105">
+                                                <div class="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 rounded flex items-center justify-center transition-opacity text-white">
+                                                    <span class="material-symbols-outlined text-[14px]">open_in_new</span>
+                                                </div>
+                                            </a>
+                                        <?php else: ?>
+                                            <a href="<?= base_url('upload/tickets/' . $item['filename']) ?>" target="_blank" class="flex flex-col items-center justify-center h-14 w-14 bg-gray-50 dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700 text-gray-400 hover:text-primary transition-colors">
+                                                <span class="material-symbols-outlined text-[20px]">movie</span>
+                                                <span class="text-[8px] uppercase font-bold tracking-tighter">Video</span>
+                                            </a>
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php endif; ?>
+                        <?php endif; ?>
                     </div>
 
                     <div class="flex items-center gap-2 mt-2">

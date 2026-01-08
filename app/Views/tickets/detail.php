@@ -65,8 +65,13 @@ if ($mediaFiles && is_array($mediaFiles) && !empty($mediaFiles)):
             if ($mediaFiles && is_array($mediaFiles)) {
                 foreach ($mediaFiles as $index => $file) {
                     $filePath = base_url('upload/tickets/' . $file['filename']);
+                    $dirName = dirname($file['filename']);
+                    $baseName = basename($file['filename']);
+                    $thumbnailPath = ($dirName === '.') 
+                        ? base_url('upload/tickets/thumbnails/' . $baseName) 
+                        : base_url('upload/tickets/' . $dirName . '/thumbnails/' . $baseName);
+
                     if ($file['type'] === 'image') {
-                        $thumbnailPath = base_url('upload/tickets/thumbnails/' . $file['filename']);
                         echo "<div class='m-2'>";
                         echo "<img src='{$thumbnailPath}' class='img-thumbnail' style='width: 100px; height: 100px; object-fit: cover; cursor: pointer;' onclick='openMediaViewer(\"{$filePath}\", \"image\")'>";
                         echo "</div>";
@@ -141,11 +146,16 @@ if ($mediaFiles && is_array($mediaFiles) && !empty($mediaFiles)):
             <?php if (!empty($movimiento['media'])): ?>
                 <div class="media-previews d-flex flex-wrap mt-2">
                     <?php 
-                    $mediaFiles = json_decode($movimiento['media'], true);
-                    foreach ($mediaFiles as $media):
-                        $filePath = base_url('upload/mv/' . $media['filename']);
+                    $mvMedia = json_decode($movimiento['media'], true);
+                    foreach ($mvMedia as $media):
+                        $filePath = base_url('upload/tickets/' . $media['filename']);
+                        $dirName = dirname($media['filename']);
+                        $baseName = basename($media['filename']);
+                        $thumbnailPath = ($dirName === '.') 
+                            ? base_url('upload/tickets/thumbnails/' . $baseName) 
+                            : base_url('upload/tickets/' . $dirName . '/thumbnails/' . $baseName);
+
                         if ($media['type'] === 'image'):
-                            $thumbnailPath = base_url('upload/mv/thumbnails/' . $media['filename']);
                     ?>
                         <div class="media-item m-1">
                             <img src="<?= $thumbnailPath ?>" alt="Imagen del movimiento" style="width: 100px; height: 100px; object-fit: cover; cursor: pointer;" onclick="openMediaViewer('<?= $filePath ?>', 'image')">

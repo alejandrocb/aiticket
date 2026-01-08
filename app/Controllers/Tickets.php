@@ -117,54 +117,51 @@ class Tickets extends Controller
         // 3. Insertar Ticket
         $ticketId = $ticketModel->insert($data);
 
-        // 3.5 Procesar Archivos (copiado de TicketMovimientos)
+        // 3. Procesar Multimedia (opcional)
         $mediaFiles = [];
-        $uploadedFiles = $this->request->getFiles('media');
+        $uploadedFiles = $this->request->getFiles();
         
-        if (!empty($uploadedFiles) && isset($uploadedFiles['media'])) {
-            foreach ($uploadedFiles['media'] as $file) {
-                if ($file->isValid() && !$file->hasMoved()) {
-                    $newName = $file->getRandomName();
-                    // Asegurar que el directorio existe
-                    if (!is_dir(FCPATH . 'upload/mv')) {
-                        mkdir(FCPATH . 'upload/mv', 0777, true);
-                    }
-                    if (!is_dir(FCPATH . 'upload/mv/thumbnails')) {
-                        mkdir(FCPATH . 'upload/mv/thumbnails', 0777, true);
-                    }
+        if ($ticketId) {
+            $ticketDir = FCPATH . 'upload/tickets/' . $ticketId;
+            $thumbDir = $ticketDir . '/thumbnails';
 
-                    $file->move(FCPATH . 'upload/mv', $newName);
-                    
-                    $fileType = $file->getClientMimeType();
-                    $isImage = strpos($fileType, 'image/') === 0;
-                    
-                    if ($isImage) {
-                        \Config\Services::image()
-                            ->withFile(FCPATH . 'upload/mv/' . $newName)
-                            ->fit(100, 100, 'center')
-                            ->save(FCPATH . 'upload/mv/thumbnails/' . $newName);
+            if ($uploadedFiles && isset($uploadedFiles['media'])) {
+                foreach ($uploadedFiles['media'] as $file) {
+                    if ($file->isValid() && !$file->hasMoved()) {
+                        $newName = $file->getRandomName();
+                        
+                        if (!is_dir($ticketDir)) mkdir($ticketDir, 0777, true);
+                        if (!is_dir($thumbDir)) mkdir($thumbDir, 0777, true);
+
+                        $file->move($ticketDir, $newName);
+                        
+                        $fileType = $file->getClientMimeType();
+                        $isImage = strpos($fileType, 'image/') === 0;
+                        
+                        if ($isImage) {
+                            try {
+                                \Config\Services::image()
+                                    ->withFile($ticketDir . '/' . $newName)
+                                    ->fit(100, 100, 'center')
+                                    ->save($thumbDir . '/' . $newName);
+                            } catch (\Exception $e) {
+                                log_message('error', 'Fallo al generar thumbnail: ' . $e->getMessage());
+                            }
+                        }
+                        
+                        // Guardamos la ruta relativa incluyendo el ID del ticket
+                        $mediaFiles[] = [
+                            'filename' => $ticketId . '/' . $newName,
+                            'type' => $isImage ? 'image' : 'video'
+                        ];
                     }
-                    
-                    $mediaFiles[] = [
-                        'filename' => $newName,
-                        'type' => $isImage ? 'image' : 'video'
-                    ];
                 }
             }
-        }
 
-        if ($ticketId) {
-            // 4. Crear Movimiento Inicial
-            $movimiento = [
-                'ticket_id'       => $ticketId,
-                'tipo_movimiento' => 'Creación',
-                'descripcion'     => 'Ticket creado exitosamente.',
-                'auto'            => 1,
-                'usuario_id'      => session()->get('id'),
-                'tipo_ticket_id'  => $data['tipo_ticket_id'],
-                'media'           => json_encode($mediaFiles)
-            ];
-            $ticketMovimientoModel->insert($movimiento);
+            // Guardar media en el ticket también
+            if (!empty($mediaFiles)) {
+                $ticketModel->update($ticketId, ['media' => json_encode($mediaFiles)]);
+            }
 
             // 5. Notificar al Responsable (si es diferente al creador)
             if (!empty($data['responsable_id']) && $data['responsable_id'] != session()->get('id')) {
@@ -212,6 +209,55 @@ class Tickets extends Controller
 
         // Actualizar el ticket
         $ticketModel->update($id, $data);
+
+        // --- Procesar Archivos (NUEVO: Soporte para imágenes en edición) ---
+        $mediaFiles = [];
+        $uploadedFiles = $this->request->getFiles();
+        if ($uploadedFiles && isset($uploadedFiles['media'])) {
+            $ticketDir = FCPATH . 'upload/tickets/' . $id;
+            $thumbDir = $ticketDir . '/thumbnails';
+
+            foreach ($uploadedFiles['media'] as $file) {
+                if ($file->isValid() && !$file->hasMoved()) {
+                    $newName = $file->getRandomName();
+                    
+                    if (!is_dir($ticketDir)) mkdir($ticketDir, 0777, true);
+                    if (!is_dir($thumbDir)) mkdir($thumbDir, 0777, true);
+
+                    $file->move($ticketDir, $newName);
+                    
+                    $fileType = $file->getClientMimeType();
+                    $isImage = strpos($fileType, 'image/') === 0;
+                    
+                    if ($isImage) {
+                        try {
+                            \Config\Services::image()
+                                ->withFile($ticketDir . '/' . $newName)
+                                ->fit(100, 100, 'center')
+                                ->save($thumbDir . '/' . $newName);
+                        } catch (\Exception $e) {
+                            log_message('error', 'Fallo al generar thumbnail: ' . $e->getMessage());
+                        }
+                    }
+                    
+                    $mediaFiles[] = [
+                        'filename' => $id . '/' . $newName, 
+                        'type' => $isImage ? 'image' : 'video'
+                    ];
+                }
+            }
+        }
+
+        // Si hay archivos, crear un movimiento para ellos
+        if (!empty($mediaFiles)) {
+            $ticketMovimientoModel->insert([
+                'ticket_id' => $id,
+                'tipo_movimiento' => 'Adjuntos',
+                'descripcion' => 'Se han añadido nuevos archivos adjuntos.',
+                'usuario_id' => session()->get('id'),
+                'media' => json_encode($mediaFiles)
+            ]);
+        }
 
         // Notificaciones
         $currentUserId = session()->get('id');
