@@ -17,6 +17,7 @@ class TicketMovimientos extends ResourceController
 
     public function create()
     {
+        $mediaFiles = [];
         $ticketId = $this->request->getPost('ticket_id');
         $ticketModel = new TicketModel();
         $ticket = $ticketModel->find($ticketId);
@@ -91,7 +92,7 @@ class TicketMovimientos extends ResourceController
         }
 
         // 2. Manejar Cambio de Responsable
-        if ($nuevoResponsable && $nuevoResponsable != $ticket['responsable_id']) {
+        if (isset($nuevoResponsable) && $nuevoResponsable != $ticket['responsable_id']) {
             $usuarioModel = new UsuarioModel();
             $oldUser = $usuarioModel->find($ticket['responsable_id']);
             $newUser = $usuarioModel->find($nuevoResponsable);
