@@ -292,11 +292,23 @@ class Tickets extends Controller
             }
         }
 
+        // Determinar mensaje preciso
+        $notifMessage = "El ticket #{$id} ha sido actualizado.";
+        if (isset($data['descripcion'])) {
+            $notifMessage = $data['descripcion'];
+        } elseif (isset($data['estado_ticket_id']) && $data['estado_ticket_id'] != $oldTicket['estado_ticket_id']) {
+            $estadoModel = new \App\Models\EstadoTicketModel();
+            $nuevoEstado = $estadoModel->find($data['estado_ticket_id']);
+            $notifMessage = "Estado cambiado a: " . ($nuevoEstado['nombre'] ?? 'Nuevo estado');
+        } elseif (!empty($mediaFiles)) {
+            $notifMessage = "Se han añadido nuevos archivos adjuntos.";
+        }
+
         foreach ($recipients as $recipientId) {
             $this->notificationModel->insert([
                 'user_id' => $recipientId,
                 'title' => 'Ticket Actualizado',
-                'message' => $data['descripcion'] ?? $oldTicket['descripcion'],
+                'message' => $notifMessage,
                 'link' => "/tickets/detail/{$id}",
                 'icon' => session()->get('imagen'),
                 'image' => $firstImg,
