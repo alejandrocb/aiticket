@@ -96,8 +96,8 @@ class TicketMovimientos extends ResourceController
             $usuarioModel = new UsuarioModel();
             $oldUser = $usuarioModel->find($ticket['responsable_id']);
             $newUser = $usuarioModel->find($nuevoResponsable);
-            $oldName = $oldUser ? $oldUser['nombre'] : 'Sin asignar';
-            $newName = $newUser ? $newUser['nombre'] : 'Sin asignar';
+            $oldName = (is_array($oldUser) && isset($oldUser['nombre'])) ? $oldUser['nombre'] : 'Sin asignar';
+            $newName = (is_array($newUser) && isset($newUser['nombre'])) ? $newUser['nombre'] : 'Sin asignar';
             $descResp = "Responsable cambiado de {$oldName} a {$newName}";
 
             $this->model->insert([
@@ -109,7 +109,7 @@ class TicketMovimientos extends ResourceController
             ]);
 
             $ticketModel->update($ticketId, [
-                'responsable_id' => $nuevoResponsable,
+                'responsable_id' => $nuevoResponsable ?: null,
                 'visto_responsable_at' => null,
                 'leido_responsable_at' => null
             ]);

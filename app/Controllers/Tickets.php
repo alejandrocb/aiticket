@@ -100,7 +100,7 @@ class Tickets extends Controller
 
         $data = [
             'cliente_id'          => $clienteId,
-            'responsable_id'      => $this->request->getPost('responsable_id'),
+            'responsable_id'      => $this->request->getPost('responsable_id') ?: null,
             'tipo_ticket_id'      => $this->request->getPost('tipo_ticket_id'),
             'prioridad_ticket_id' => $this->request->getPost('prioridad_ticket_id'),
             'estado_ticket_id'    => $this->request->getPost('estado_ticket_id'),
@@ -193,7 +193,7 @@ class Tickets extends Controller
 
         $data = [
             'cliente_id' => $this->request->getPost('cliente_id'),
-            'responsable_id' => $this->request->getPost('responsable_id'),
+            'responsable_id' => $this->request->getPost('responsable_id') ?: null,
             'tipo_ticket_id' => $this->request->getPost('tipo_ticket_id'),
             'prioridad_ticket_id' => $this->request->getPost('prioridad_ticket_id'),
             'estado_ticket_id' => $this->request->getPost('estado_ticket_id'),
@@ -285,8 +285,8 @@ class Tickets extends Controller
         if (isset($data['responsable_id']) && $data['responsable_id'] != $oldTicket['responsable_id']) {
             $oldResponsable = $usuarioModel->find($oldTicket['responsable_id']);
             $newResponsable = $usuarioModel->find($data['responsable_id']);
-            $nombreOld = $oldResponsable ? $oldResponsable['nombre'] : 'Sin asignar';
-            $nombreNew = $newResponsable ? $newResponsable['nombre'] : 'Sin asignar';
+            $nombreOld = (is_array($oldResponsable) && isset($oldResponsable['nombre'])) ? $oldResponsable['nombre'] : 'Sin asignar';
+            $nombreNew = (is_array($newResponsable) && isset($newResponsable['nombre'])) ? $newResponsable['nombre'] : 'Sin asignar';
 
             $movimiento = [
                 'ticket_id' => $id,
