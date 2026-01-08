@@ -36,9 +36,9 @@ self.addEventListener('push', function (event) {
     const title = data.title || 'Aiticket';
     const options = {
         body: data.body || 'Tienes una nueva notificación.',
-        icon: 'assets/images/icon-192.png',  // Logo de la app (izquierda)
-        badge: 'assets/images/badge-white.png',  // Logo monocromo (esquina)
-        image: data.userPhoto || null,  // Foto del usuario (grande, visible)
+        icon: data.userPhoto || 'assets/images/icon-192.png',  // Foto del usuario si existe, si no, logo de la app
+        badge: 'assets/images/badge-white.png',  // Logo monocromo (esquina y barra de estado móvil)
+        image: data.userPhoto || null,  // Foto del usuario (grande, visible en panel de notificaciones)
         vibrate: [200, 100, 200],
         tag: data.tag || 'aiticket-notification',
         requireInteraction: false,
