@@ -165,12 +165,23 @@ class Tickets extends Controller
 
             // 5. Notificar al Responsable (si es diferente al creador)
             if (!empty($data['responsable_id']) && $data['responsable_id'] != session()->get('id')) {
+                 $firstImg = null;
+                 if (!empty($mediaFiles)) {
+                     foreach ($mediaFiles as $m) {
+                         if ($m['type'] === 'image') {
+                             $firstImg = $m['filename'];
+                             break;
+                         }
+                     }
+                 }
+
                  $this->notificationModel->insert([
                     'user_id'    => $data['responsable_id'],
                     'title'      => 'Nuevo Ticket Asignado',
-                    'message'    => "Se te ha asignado el ticket #{$ticketId}.",
+                    'message'    => $data['descripcion'],
                     'link'       => "/tickets/detail/{$ticketId}",
                     'icon'       => session()->get('imagen'),
+                    'image'      => $firstImg,
                     'created_at' => date('Y-m-d H:i:s')
                 ]);
             }
@@ -270,13 +281,25 @@ class Tickets extends Controller
             return $uid && $uid != $currentUserId;
         });
 
+        // Obtener primera imagen de esta actualización
+        $firstImg = null;
+        if (!empty($mediaFiles)) {
+            foreach ($mediaFiles as $m) {
+                if ($m['type'] === 'image') {
+                    $firstImg = $m['filename'];
+                    break;
+                }
+            }
+        }
+
         foreach ($recipients as $recipientId) {
             $this->notificationModel->insert([
                 'user_id' => $recipientId,
                 'title' => 'Ticket Actualizado',
-                'message' => "El ticket #{$id} ha sido actualizado.",
+                'message' => $data['descripcion'] ?? $oldTicket['descripcion'],
                 'link' => "/tickets/detail/{$id}",
                 'icon' => session()->get('imagen'),
+                'image' => $firstImg,
                 'created_at' => date('Y-m-d H:i:s')
             ]);
         }
