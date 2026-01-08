@@ -90,8 +90,9 @@ class TicketModel extends Model
                       usuarios.imagen as responsable_imagen,
                       COALESCE(ultimo_movimiento.fecha_movimiento, tickets.fecha_creacion) as fecha_relevante,
                       ultimo_movimiento.descripcion as ultimo_movimiento,
+                      ultimo_movimiento.tipo_movimiento as ultimo_movimiento_tipo,
                       ultimo_movimiento.fecha_movimiento as fecha_ultimo_movimiento,
-                      ultimo_movimiento.imagen as imagen_ultimo_movimiento,
+                      ultimo_movimiento.media as ultimo_movimiento_media,
                       tickets.visto_responsable_at,
                       tickets.leido_responsable_at')
             ->join('clientes', 'clientes.id = tickets.cliente_id')
@@ -99,7 +100,7 @@ class TicketModel extends Model
             ->join('tipos_ticket', 'tipos_ticket.id = tickets.tipo_ticket_id')
             ->join('prioridades_ticket', 'prioridades_ticket.id = tickets.prioridad_ticket_id')
             ->join('usuarios', 'usuarios.id = tickets.responsable_id', 'left')
-            ->join('(SELECT tm.ticket_id, tm.descripcion, tm.fecha_movimiento, tm.imagen
+            ->join('(SELECT tm.ticket_id, tm.descripcion, tm.tipo_movimiento, tm.fecha_movimiento, tm.imagen, tm.media
                      FROM ticket_movimientos tm
                      INNER JOIN (
                          SELECT ticket_id, MAX(fecha_movimiento) as max_fecha
@@ -109,8 +110,6 @@ class TicketModel extends Model
                      ) as latest_non_auto ON tm.ticket_id = latest_non_auto.ticket_id AND tm.fecha_movimiento = latest_non_auto.max_fecha
                      WHERE tm.auto IS NULL OR tm.auto != 1) as ultimo_movimiento', 
                     'ultimo_movimiento.ticket_id = tickets.id', 'left')
-            ->where('estados_ticket.id <> 3')
-            ->where('estados_ticket.id <> 11')
             ->where('(tickets.fecha_inicio_publicacion IS NULL OR tickets.fecha_inicio_publicacion <= NOW())')
             ->whereIn('tickets.escenario_id', $escenariosActivos)
             ->orderBy('fecha_relevante', 'DESC')
@@ -141,8 +140,9 @@ class TicketModel extends Model
                               usuarios.imagen as responsable_imagen,
                               COALESCE(ticket_movimientos.fecha_movimiento, tickets.fecha_creacion) as fecha_relevante,
                               ticket_movimientos.descripcion as ultimo_movimiento,
+                              ticket_movimientos.tipo_movimiento as ultimo_movimiento_tipo,
                               ticket_movimientos.fecha_movimiento as fecha_ultimo_movimiento,
-                              ticket_movimientos.imagen as imagen_ultimo_movimiento,
+                              ticket_movimientos.media as ultimo_movimiento_media,
                               ticket_movimientos.auto as auto_ultimo_movimiento,
                               tickets.visto_responsable_at,
                               tickets.leido_responsable_at')
@@ -151,7 +151,7 @@ class TicketModel extends Model
                     ->join('tipos_ticket', 'tipos_ticket.id = tickets.tipo_ticket_id')
                     ->join('prioridades_ticket', 'prioridades_ticket.id = tickets.prioridad_ticket_id')
                     ->join('usuarios', 'usuarios.id = tickets.responsable_id', 'left')
-                    ->join('(SELECT ticket_id, descripcion, fecha_movimiento, imagen, auto FROM ticket_movimientos WHERE id IN (SELECT MAX(id) FROM ticket_movimientos GROUP BY ticket_id)) as ticket_movimientos', 'ticket_movimientos.ticket_id = tickets.id', 'left')
+                    ->join('(SELECT ticket_id, descripcion, tipo_movimiento, fecha_movimiento, imagen, media, auto FROM ticket_movimientos WHERE id IN (SELECT MAX(id) FROM ticket_movimientos GROUP BY ticket_id)) as ticket_movimientos', 'ticket_movimientos.ticket_id = tickets.id', 'left')
                     ->where('estados_ticket.id', 3)
                     ->where('COALESCE(ticket_movimientos.fecha_movimiento, tickets.fecha_creacion) >=', $oneMonthAgo)
                     ->whereIn('tickets.escenario_id', $escenariosActivos)
@@ -182,14 +182,15 @@ class TicketModel extends Model
                       usuarios.imagen as responsable_imagen,
                       COALESCE(ultimo_movimiento.fecha_movimiento, tickets.fecha_creacion) as fecha_relevante,
                       ultimo_movimiento.descripcion as ultimo_movimiento,
+                      ultimo_movimiento.tipo_movimiento as ultimo_movimiento_tipo,
                       ultimo_movimiento.fecha_movimiento as fecha_ultimo_movimiento,
-                      ultimo_movimiento.imagen as imagen_ultimo_movimiento')
+                      ultimo_movimiento.media as ultimo_movimiento_media')
             ->join('clientes', 'clientes.id = tickets.cliente_id')
             ->join('estados_ticket', 'estados_ticket.id = tickets.estado_ticket_id')
             ->join('tipos_ticket', 'tipos_ticket.id = tickets.tipo_ticket_id')
             ->join('prioridades_ticket', 'prioridades_ticket.id = tickets.prioridad_ticket_id')
             ->join('usuarios', 'usuarios.id = tickets.responsable_id', 'left')
-            ->join('(SELECT tm.ticket_id, tm.descripcion, tm.fecha_movimiento, tm.imagen
+            ->join('(SELECT tm.ticket_id, tm.descripcion, tm.tipo_movimiento, tm.fecha_movimiento, tm.imagen, tm.media
                      FROM ticket_movimientos tm
                      INNER JOIN (
                          SELECT ticket_id, MAX(fecha_movimiento) as max_fecha

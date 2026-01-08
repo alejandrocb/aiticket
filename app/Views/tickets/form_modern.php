@@ -13,7 +13,7 @@
         <?php endif; ?>
     </div>
     
-    <form action="<?= base_url('tickets/insertar') ?>" method="POST" enctype="multipart/form-data">
+    <form action="<?= isset($ticket) ? base_url('tickets/actualizar/' . $ticket['id']) : base_url('tickets/insertar') ?>" method="POST" enctype="multipart/form-data">
         <div class="flex flex-col gap-4">
             <div class="flex flex-col gap-2">
                 <label class="text-[#111418] dark:text-white text-base font-medium leading-normal">Cliente</label>
@@ -125,3 +125,70 @@
         </div>
     </form>
 </div>
+
+<script>
+let selectedFiles = [];
+
+document.getElementById('dropzone-file').addEventListener('change', function(e) {
+    const preview = document.getElementById('file-preview');
+    const files = Array.from(this.files);
+    
+    files.forEach(file => {
+        // Evitar duplicados si el usuario selecciona el mismo archivo varias veces
+        if (!selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
+            selectedFiles.push(file);
+        }
+    });
+
+    renderPreviews();
+    updateInput();
+});
+
+function renderPreviews() {
+    const preview = document.getElementById('file-preview');
+    preview.innerHTML = '';
+    
+    selectedFiles.forEach((file, index) => {
+        const container = document.createElement('div');
+        container.className = 'relative group w-20 h-20 rounded-lg overflow-hidden border border-gray-200 dark:border-[#3b4754] bg-gray-100 dark:bg-[#1c2127] shadow-sm';
+        
+        if (file.type.startsWith('image/')) {
+            const img = document.createElement('img');
+            img.className = 'w-full h-full object-cover';
+            const reader = new FileReader();
+            reader.onload = e => img.src = e.target.result;
+            reader.readAsDataURL(file);
+            container.appendChild(img);
+        } else {
+            const iconWrap = document.createElement('div');
+            iconWrap.className = 'w-full h-full flex flex-col items-center justify-center text-gray-400';
+            iconWrap.innerHTML = `
+                <span class="material-symbols-outlined text-2xl">description</span>
+                <span class="text-[8px] uppercase font-bold mt-1">${file.name.split('.').pop()}</span>
+            `;
+            container.appendChild(iconWrap);
+        }
+        
+        // Botón Eliminar
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md hover:bg-red-600';
+        removeBtn.innerHTML = '<span class="material-symbols-outlined text-[14px]">close</span>';
+        removeBtn.onclick = (e) => {
+            e.preventDefault();
+            selectedFiles.splice(index, 1);
+            renderPreviews();
+            updateInput();
+        };
+        
+        container.appendChild(removeBtn);
+        preview.appendChild(container);
+    });
+}
+
+function updateInput() {
+    const dt = new DataTransfer();
+    selectedFiles.forEach(file => dt.items.add(file));
+    document.getElementById('dropzone-file').files = dt.files;
+}
+</script>
