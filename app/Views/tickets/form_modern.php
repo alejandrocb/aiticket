@@ -53,7 +53,7 @@
                     <select class="w-full appearance-none rounded-lg border border-gray-300 dark:border-[#3b4754] bg-white dark:bg-[#1c2127] text-[#111418] dark:text-white h-14 px-4 pr-10 text-base font-normal focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors" name="tipo_ticket_id" required>
                         <option disabled="" selected="" value="">Seleccione tipo</option>
                          <?php foreach ($tipos as $tipo): ?>
-                            <option value="<?= $tipo['id'] ?>" <?= (isset($ticket) && $ticket['tipo_ticket_id'] == $tipo['id']) ? 'selected' : '' ?>><?= $tipo['nombre'] ?></option>
+                            <option value="<?= $tipo['id'] ?>" <?= (isset($ticket) ? ($ticket['tipo_ticket_id'] == $tipo['id']) : (1 == $tipo['id'])) ? 'selected' : '' ?>><?= $tipo['nombre'] ?></option>
                         <?php endforeach; ?>
                     </select>
                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#9dabb9]">
@@ -70,7 +70,7 @@
                 <div class="relative">
                     <select class="w-full appearance-none rounded-lg border border-gray-300 dark:border-[#3b4754] bg-white dark:bg-[#1c2127] text-[#111418] dark:text-white h-14 px-4 pr-10 text-base font-normal focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors" name="prioridad_ticket_id" required>
                         <?php foreach ($prioridades as $prioridad): ?>
-                            <option value="<?= $prioridad['id'] ?>" <?= (isset($ticket) && $ticket['prioridad_ticket_id'] == $prioridad['id']) ? 'selected' : '' ?>><?= $prioridad['nombre'] ?></option>
+                            <option value="<?= $prioridad['id'] ?>" <?= (isset($ticket) ? ($ticket['prioridad_ticket_id'] == $prioridad['id']) : (2 == $prioridad['id'])) ? 'selected' : '' ?>><?= $prioridad['nombre'] ?></option>
                         <?php endforeach; ?>
                     </select>
                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#9dabb9]">
