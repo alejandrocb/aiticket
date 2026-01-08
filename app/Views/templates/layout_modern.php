@@ -94,14 +94,8 @@
                         <span class="material-symbols-outlined">add</span>
                     </a>
 
-                    <!-- User Profile Button -->
+                    <!-- User Profile Area -->
                     <div class="flex items-center gap-3 ml-1 pl-3 border-l border-slate-200 dark:border-slate-800">
-                        <!-- Theme Toggle Button -->
-                        <button id="theme-toggle" class="flex items-center justify-center h-10 w-10 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mr-1">
-                            <span id="theme-toggle-dark-icon" class="hidden material-symbols-outlined">dark_mode</span>
-                            <span id="theme-toggle-light-icon" class="hidden material-symbols-outlined">light_mode</span>
-                        </button>
-
                         <div class="hidden md:flex flex-col items-end">
                             <span class="text-sm font-semibold text-slate-900 dark:text-white leading-none mb-1"><?= session()->get('nombre') ?></span>
                             <span class="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider">Mi Perfil</span>
@@ -253,6 +247,7 @@
         const lightIcon = document.getElementById('theme-toggle-light-icon');
 
         function updateIcons() {
+            if (!darkIcon || !lightIcon) return;
             if (document.documentElement.classList.contains('dark')) {
                 darkIcon.classList.add('hidden');
                 lightIcon.classList.remove('hidden');
@@ -262,18 +257,19 @@
             }
         }
 
-        updateIcons();
-
-        themeToggleBtn.addEventListener('click', () => {
-            if (document.documentElement.classList.contains('dark')) {
-                document.documentElement.classList.remove('dark');
-                localStorage.setItem('theme', 'light');
-            } else {
-                document.documentElement.classList.add('dark');
-                localStorage.setItem('theme', 'dark');
-            }
+        if (themeToggleBtn) {
             updateIcons();
-        });
+            themeToggleBtn.addEventListener('click', () => {
+                if (document.documentElement.classList.contains('dark')) {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                }
+                updateIcons();
+            });
+        }
     });
 </script>
     <!-- Push Notifications -->

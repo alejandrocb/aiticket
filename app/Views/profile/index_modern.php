@@ -102,6 +102,24 @@
                 Actualizar Contraseña
             </button>
         </form>
+    </div>
+
+    <div class="px-4 mt-8">
+        <h3 class="text-text-secondary text-xs font-bold uppercase tracking-wider mb-2 ml-1">Personalización</h3>
+        <button type="button" id="theme-toggle" class="flex w-full items-center justify-between p-4 bg-white dark:bg-surface-dark border border-gray-200 dark:border-surface-border rounded-lg hover:bg-gray-50 dark:hover:bg-surface-border/30 transition-colors group text-left shadow-sm">
+            <div class="flex items-center gap-3">
+                <div class="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary">
+                    <span id="theme-toggle-dark-icon" class="hidden material-symbols-outlined text-[20px]">dark_mode</span>
+                    <span id="theme-toggle-light-icon" class="hidden material-symbols-outlined text-[20px]">light_mode</span>
+                </div>
+                <div>
+                    <span class="text-base font-medium dark:text-white block">Tema Visual</span>
+                    <span class="text-xs text-text-secondary block">Alternar entre modo claro y oscuro</span>
+                </div>
+            </div>
+            <span class="text-[10px] font-bold text-primary px-2 py-1 bg-primary/5 rounded-md uppercase tracking-wider border border-primary/10">Cambiar</span>
+        </button>
+    </div>
     <div class="px-4 mt-8">
         <div class="p-4 bg-white dark:bg-surface-dark border border-gray-200 dark:border-surface-border rounded-lg">
             <div class="flex items-center gap-3 mb-4">
