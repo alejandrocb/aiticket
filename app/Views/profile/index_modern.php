@@ -106,7 +106,7 @@
 
     <div class="px-4 mt-8">
         <h3 class="text-text-secondary text-xs font-bold uppercase tracking-wider mb-2 ml-1">Personalización</h3>
-        <button type="button" id="theme-toggle" class="flex w-full items-center justify-between p-4 bg-white dark:bg-surface-dark border border-gray-200 dark:border-surface-border rounded-lg hover:bg-gray-50 dark:hover:bg-surface-border/30 transition-colors group text-left shadow-sm">
+        <button type="button" id="theme-toggle" onclick="toggleTheme(event)" class="flex w-full items-center justify-between p-4 bg-white dark:bg-surface-dark border border-gray-200 dark:border-surface-border rounded-lg hover:bg-gray-50 dark:hover:bg-surface-border/30 transition-colors group text-left shadow-sm">
             <div class="flex items-center gap-3">
                 <div class="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary">
                     <span id="theme-toggle-dark-icon" class="hidden material-symbols-outlined text-[20px]">dark_mode</span>
