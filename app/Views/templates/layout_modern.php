@@ -241,13 +241,12 @@
         loadNotifications();
         setInterval(loadNotifications, 60000); // Check every minute
 
-        // Theme Toggle Logic
-        const themeToggleBtn = document.getElementById('theme-toggle');
-        const darkIcon = document.getElementById('theme-toggle-dark-icon');
-        const lightIcon = document.getElementById('theme-toggle-light-icon');
-
-        function updateIcons() {
+        // Theme Toggle Logic (Global & Robust)
+        window.updateThemeIcons = function() {
+            const darkIcon = document.getElementById('theme-toggle-dark-icon');
+            const lightIcon = document.getElementById('theme-toggle-light-icon');
             if (!darkIcon || !lightIcon) return;
+            
             if (document.documentElement.classList.contains('dark')) {
                 darkIcon.classList.add('hidden');
                 lightIcon.classList.remove('hidden');
@@ -255,11 +254,13 @@
                 darkIcon.classList.remove('hidden');
                 lightIcon.classList.add('hidden');
             }
-        }
+        };
 
-        if (themeToggleBtn) {
-            updateIcons();
-            themeToggleBtn.addEventListener('click', () => {
+        window.toggleTheme = function(e) {
+            if (e) e.preventDefault();
+            console.log("Aiticket: Cambiando tema...");
+            
+            try {
                 if (document.documentElement.classList.contains('dark')) {
                     document.documentElement.classList.remove('dark');
                     localStorage.setItem('theme', 'light');
@@ -267,9 +268,20 @@
                     document.documentElement.classList.add('dark');
                     localStorage.setItem('theme', 'dark');
                 }
-                updateIcons();
-            });
-        }
+            } catch (e) {
+                console.error("No se pudo guardar la preferencia de tema en localStorage:", e);
+                // Al menos cambiamos la clase para que funcione en la sesión actual
+                if (document.documentElement.classList.contains('dark')) {
+                    document.documentElement.classList.remove('dark');
+                } else {
+                    document.documentElement.classList.add('dark');
+                }
+            }
+            window.updateThemeIcons();
+        };
+
+        // Initial Icon Update
+        window.updateThemeIcons();
     });
 </script>
     <!-- Push Notifications -->
