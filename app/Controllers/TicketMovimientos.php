@@ -146,6 +146,18 @@ class TicketMovimientos extends ResourceController
         // Notificaciones (Lógica simplificada para los cambios realizados)
         $notificationModel = new NotificationModel();
         $ticket = $ticketModel->find($ticketId); // Refresh data
+        
+        // Obtener primera imagen si existe
+        $firstImage = null;
+        if (!empty($mediaFiles)) {
+            foreach ($mediaFiles as $m) {
+                if ($m['type'] === 'image') {
+                    $firstImage = $m['filename'];
+                    break;
+                }
+            }
+        }
+
         $recipients = array_unique([$ticket['usuario_id'], $ticket['responsable_id']]);
         $recipients = array_filter($recipients, function($uid) use ($currentUserId) {
             return $uid && $uid != $currentUserId;
@@ -155,9 +167,10 @@ class TicketMovimientos extends ResourceController
             $notificationModel->insert([
                 'user_id' => $recipientId,
                 'title' => 'Actualización de Ticket',
-                'message' => "El ticket #{$ticketId} ha sido actualizado.",
+                'message' => $descripcionUsuario ?: 'Se ha añadido contenido multimedia',
                 'link' => "/tickets/detail/{$ticketId}",
                 'icon' => session()->get('imagen'),
+                'image' => $firstImage,
                 'created_at' => date('Y-m-d H:i:s')
             ]);
         }

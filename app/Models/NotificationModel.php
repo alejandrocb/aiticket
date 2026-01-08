@@ -10,7 +10,7 @@ class NotificationModel extends Model
     protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
     protected $returnType = 'array';
-    protected $allowedFields = ['user_id', 'title', 'message', 'link', 'icon', 'is_read', 'created_at'];
+    protected $allowedFields = ['user_id', 'title', 'message', 'link', 'icon', 'image', 'is_read', 'created_at'];
     protected $useTimestamps = true;
     protected $createdField  = 'created_at';
     protected $updatedField  = '';
@@ -29,7 +29,8 @@ class NotificationModel extends Model
                     $notification['title'],
                     $notification['message'],
                     $notification['link'],
-                    $notification['icon'] ?? null
+                    $notification['icon'] ?? null,
+                    $notification['image'] ?? null
                 );
             }
         }
@@ -58,7 +59,7 @@ class NotificationModel extends Model
     /**
      * Envía una notificación push a todos los dispositivos suscritos de un usuario
      */
-    public function sendPushNotification($userId, $title, $message, $link = '/', $icon = null)
+    public function sendPushNotification($userId, $title, $message, $link = '/', $icon = null, $image = null)
     {
         $db = \Config\Database::connect();
         $subs = $db->table('push_subscriptions')
@@ -87,6 +88,7 @@ class NotificationModel extends Model
                 'body'  => $message,
                 'url'   => $link,
                 'userPhoto' => $userPhotoUrl,
+                'image' => $image ? base_url('upload/tickets/' . $image) : null,
                 'tag'   => 'ticket-' . uniqid()
             ]);
 
