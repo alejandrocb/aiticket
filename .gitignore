@@ -4,7 +4,6 @@
 /node_modules/
 /public/assets/*
 !/public/assets/index.html
-/public/index.php
 /writable/cache/
 /writable/debugbar/
 /writable/logs/
