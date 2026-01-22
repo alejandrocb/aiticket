@@ -17,7 +17,7 @@ El sistema se conecta a una base de datos MySQL (remota). Las principales tablas
 ## Requisitos del Servidor
 
 - PHP 7.4 o superior (Recomendado PHP 8.1+)
-- Extensiones PHP: `intl`, `mbstring`, `json`, `mysqlnd`, `xml`.
+- Extensiones PHP: `intl`, `mbstring`, `json`, `mysqlnd`, `xml`, `curl`
 
 ## Instalación y Configuración
 

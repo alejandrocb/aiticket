@@ -48,6 +48,10 @@ class Home extends Controller
     {
         $escenariosActivos = $this->getEscenariosActivos();
 
+        if (empty($escenariosActivos)) {
+            return [];
+        }
+
         $builder = $this->ticketModel->builder();
 
         if ($period == 'month') {
@@ -71,6 +75,10 @@ class Home extends Controller
     {
         $escenariosActivos = $this->getEscenariosActivos();
 
+        if (empty($escenariosActivos)) {
+            return [];
+        }
+
         $builder = $this->ticketModel->builder();
 
         $builder->select('DATE(tickets.fecha_creacion) as fecha, COUNT(tickets.id) as total_tickets')
@@ -85,6 +93,10 @@ class Home extends Controller
     private function getMovimientosLast10Days()
     {
         $escenariosActivos = $this->getEscenariosActivos();
+
+        if (empty($escenariosActivos)) {
+            return [];
+        }
 
         $builder = $this->ticketMovimientoModel->builder();
 
