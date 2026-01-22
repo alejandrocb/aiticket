@@ -69,4 +69,5 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('profile/update', 'Profile::update');
     $routes->post('profile/updatePassword', 'Profile::updatePassword');
     $routes->post('profile/updateAvatar', 'Profile::updateAvatar');
+    $routes->post('profile/updateEscenarios', 'Profile::updateEscenarios');
 });

@@ -288,8 +288,9 @@
                     PushHandler.log('Error: VAPID Key no encontrada.');
                 }
             } else {
-                console.error("Aiticket: PushHandler NO está definido.");
-                alert("Error crítico: El controlador de notificaciones no cargó.");
+                // Si estamos en HTTP (no seguro), es normal que el navegador bloquee ciertas funcionalidades
+                // No mostramos alerta crítica para no molestar al usuario en entornos de desarrollo/HTTP
+                console.warn("Aiticket: PushHandler no está cargado. Esto es normal en entornos HTTP no seguros o si el script fue bloqueado.");
             }
         });
     </script>
