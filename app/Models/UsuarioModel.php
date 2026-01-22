@@ -39,6 +39,10 @@ class UsuarioModel extends Model
     {
         $escenariosActivos = $this->getEscenariosActivos();
 
+        if (empty($escenariosActivos)) {
+            return [];
+        }
+
         return $this->select('usuarios.id, usuarios.nombre, usuarios.imagen')
                     ->join('usuario_escenario', 'usuarios.id = usuario_escenario.usuario_id')
                     ->whereIn('usuario_escenario.escenario_id', $escenariosActivos)
