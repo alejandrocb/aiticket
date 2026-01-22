@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\UsuarioModel;
+use App\Models\EscenarioModel;
 use CodeIgniter\Controller;
 
 class Profile extends Controller
@@ -23,9 +24,13 @@ class Profile extends Controller
             return redirect()->to('/login');
         }
 
+        $escenarioModel = new EscenarioModel();
+        $escenarios = $escenarioModel->getAllWithStatus($userId);
+
         $data = [
             'title' => 'Mi Perfil',
             'usuario' => $usuario,
+            'escenarios' => $escenarios,
             'content' => 'profile/index_modern'
         ];
 
@@ -95,5 +100,51 @@ class Profile extends Controller
         }
 
         return redirect()->back()->with('error', 'Error al subir la imagen');
+    }
+
+    public function updateEscenarios()
+    {
+        $userId = session()->get('id');
+        $escenariosPost = $this->request->getPost('escenarios') ?? []; // Array de IDs seleccionados
+
+        $db = \Config\Database::connect();
+        $builder = $db->table('usuario_escenario');
+
+        // Empezamos transacción por seguridad
+        $db->transStart();
+
+        // Ponemos todos a activo = 0 para este usuario
+        $builder->where('usuario_id', $userId)->update(['activo' => 0]);
+
+        // Para cada ID recibido, lo activamos o lo creamos si no existe
+        foreach ($escenariosPost as $escenarioId) {
+            $check = $builder->where('usuario_id', $userId)
+                             ->where('escenario_id', $escenarioId)
+                             ->get()
+                             ->getRow();
+
+            if ($check) {
+                // Existe, lo activamos
+                $db->table('usuario_escenario')
+                   ->where('usuario_id', $userId)
+                   ->where('escenario_id', $escenarioId)
+                   ->update(['activo' => 1]);
+            } else {
+                // No existe, lo insertamos
+                $db->table('usuario_escenario')->insert([
+                    'usuario_id' => $userId,
+                    'escenario_id' => $escenarioId,
+                    'activo' => 1
+                ]);
+            }
+        }
+
+        $db->transComplete();
+
+        if ($db->transStatus() === false) {
+            return redirect()->back()->with('error', 'Error al actualizar escenarios');
+        }
+
+        return redirect()->back()->with('success', 'Escenarios actualizados correctamente');
     }
 }

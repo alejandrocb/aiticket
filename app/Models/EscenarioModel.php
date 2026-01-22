@@ -15,4 +15,11 @@ class EscenarioModel extends Model
                     ->where('usuario_escenario.usuario_id', $usuario_id)
                     ->findAll();
     }
+
+    public function getAllWithStatus($usuario_id)
+    {
+        return $this->select('escenarios.*, ue.activo')
+                    ->join('usuario_escenario ue', "ue.escenario_id = escenarios.id AND ue.usuario_id = $usuario_id", 'left')
+                    ->findAll();
+    }
 }

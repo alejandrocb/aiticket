@@ -105,6 +105,42 @@
     </div>
 
     <div class="px-4 mt-8">
+        <h3 class="text-text-secondary text-xs font-bold uppercase tracking-wider mb-2 ml-1">Escenarios de Trabajo</h3>
+        <div class="p-4 bg-white dark:bg-surface-dark border border-gray-200 dark:border-surface-border rounded-lg shadow-sm">
+            <form action="<?= base_url('profile/updateEscenarios') ?>" method="POST" class="space-y-4">
+                <div class="space-y-2">
+                    <?php if (empty($escenarios)): ?>
+                        <p class="text-sm text-text-secondary italic">No hay escenarios configurados.</p>
+                    <?php else: ?>
+                        <?php foreach ($escenarios as $esc): ?>
+                            <label class="flex items-center justify-between p-3 rounded-lg border border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group">
+                                <div class="flex items-center gap-3">
+                                    <div class="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary">
+                                        <span class="material-symbols-outlined text-[20px]">account_tree</span>
+                                    </div>
+                                    <span class="text-sm font-medium dark:text-white"><?= $esc['nombre'] ?></span>
+                                </div>
+                                <div class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" name="escenarios[]" value="<?= $esc['id'] ?>" class="sr-only peer" <?= $esc['activo'] == 1 ? 'checked' : '' ?>>
+                                    <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+                                </div>
+                            </label>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+
+                <?php if (!empty($escenarios)): ?>
+                    <button type="submit" class="w-full bg-slate-800 dark:bg-primary hover:bg-slate-900 dark:hover:bg-blue-600 text-white font-bold h-11 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-[20px]">save</span>
+                        Guardar Escenarios
+                    </button>
+                    <p class="text-[10px] text-center text-text-secondary mt-2">Determina qué tickets y datos serán visibles en tu sesión.</p>
+                <?php endif; ?>
+            </form>
+        </div>
+    </div>
+
+    <div class="px-4 mt-8">
         <h3 class="text-text-secondary text-xs font-bold uppercase tracking-wider mb-2 ml-1">Personalización</h3>
         <button type="button" id="theme-toggle" onclick="toggleTheme(event)" class="flex w-full items-center justify-between p-4 bg-white dark:bg-surface-dark border border-gray-200 dark:border-surface-border rounded-lg hover:bg-gray-50 dark:hover:bg-surface-border/30 transition-colors group text-left shadow-sm">
             <div class="flex items-center gap-3">

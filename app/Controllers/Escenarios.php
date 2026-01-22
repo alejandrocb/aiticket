@@ -2,13 +2,13 @@
 
 namespace App\Controllers;
 
-use App\Models\EscenariosModel;
+use App\Models\EscenarioModel;
 use CodeIgniter\RESTful\ResourceController;
 
 class Escenarios extends ResourceController
 
 {
-    protected $modelName = 'App\Models\EscenariosModel';
+    protected $modelName = 'App\Models\EscenarioModel';
     protected $format    = 'json';
 
     public function index()
