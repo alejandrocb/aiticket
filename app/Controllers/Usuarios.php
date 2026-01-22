@@ -2,6 +2,7 @@
 
 use App\Models\UsuarioModel;
 use App\Models\TipoUsuarioModel;
+use App\Models\EscenarioModel;
 use CodeIgniter\RESTful\ResourceController;
 
 class Usuarios extends ResourceController
@@ -27,9 +28,12 @@ class Usuarios extends ResourceController
     {
         $tipoUsuarioModel = new \App\Models\TipoUsuarioModel();
         
+        $escenarioModel = new EscenarioModel();
+        
         $data = [
             'title' => 'Crear Usuario',
             'roles' => $tipoUsuarioModel->findAll(),
+            'escenarios' => $escenarioModel->findAll(),
             'content' => 'usuarios/form_modern'
         ];
 
@@ -45,9 +49,30 @@ class Usuarios extends ResourceController
             'tipo_usuario_id' => $this->request->getPost('tipo_usuario_id'),
         ];
 
-        if ($this->model->insert($data)) {
+        $db = \Config\Database::connect();
+        $db->transStart();
+        
+        $userId = $this->model->insert($data);
+
+        if ($userId) {
+            $escenariosPost = $this->request->getPost('escenarios') ?? [];
+            foreach ($escenariosPost as $escenarioId) {
+                $db->table('usuario_escenario')->insert([
+                    'usuario_id' => $userId,
+                    'escenario_id' => $escenarioId,
+                    'activo' => 1
+                ]);
+            }
+            
+            $db->transComplete();
+            
+            if ($db->transStatus() === false) {
+                return redirect()->back()->withInput()->with('errors', 'Error al asignar escenarios');
+            }
+
             return redirect()->to('/usuarios')->with('success', 'Usuario creado con éxito');
         } else {
+            $db->transRollback();
             return redirect()->back()->withInput()->with('errors', $this->model->errors());
         }
     }
@@ -57,6 +82,8 @@ class Usuarios extends ResourceController
         $tipoUsuarioModel = new \App\Models\TipoUsuarioModel();
         $usuario = $this->model->find($id);
 
+        $escenarioModel = new EscenarioModel();
+
         if (!$usuario) {
             return redirect()->to('/usuarios')->with('errors', 'Usuario no encontrado');
         }
@@ -65,6 +92,7 @@ class Usuarios extends ResourceController
             'title' => 'Editar Usuario',
             'usuario' => $usuario,
             'roles' => $tipoUsuarioModel->findAll(),
+            'escenarios' => $escenarioModel->getAllWithStatus($id),
             'content' => 'usuarios/form_modern'
         ];
 
@@ -84,9 +112,45 @@ class Usuarios extends ResourceController
             $data['password'] = password_hash($password, PASSWORD_DEFAULT);
         }
 
+        $db = \Config\Database::connect();
+        $db->transStart();
+
         if ($this->model->update($id, $data)) {
+            $escenariosPost = $this->request->getPost('escenarios') ?? [];
+            
+            // Sincronizar escenarios: primero desactivamos todos para este usuario
+            $db->table('usuario_escenario')->where('usuario_id', $id)->update(['activo' => 0]);
+
+            foreach ($escenariosPost as $escenarioId) {
+                $check = $db->table('usuario_escenario')
+                            ->where('usuario_id', $id)
+                            ->where('escenario_id', $escenarioId)
+                            ->get()
+                            ->getRow();
+
+                if ($check) {
+                    $db->table('usuario_escenario')
+                       ->where('usuario_id', $id)
+                       ->where('escenario_id', $escenarioId)
+                       ->update(['activo' => 1]);
+                } else {
+                    $db->table('usuario_escenario')->insert([
+                        'usuario_id' => $id,
+                        'escenario_id' => $escenarioId,
+                        'activo' => 1
+                    ]);
+                }
+            }
+
+            $db->transComplete();
+
+            if ($db->transStatus() === false) {
+                return redirect()->back()->withInput()->with('errors', 'Error al actualizar escenarios');
+            }
+
             return redirect()->to('/usuarios')->with('success', 'Usuario actualizado con éxito');
         } else {
+            $db->transRollback();
             return redirect()->back()->withInput()->with('errors', $this->model->errors());
         }
     }

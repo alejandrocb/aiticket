@@ -37,6 +37,27 @@
             </div>
         </div>
 
+        <div class="flex flex-col gap-3 mt-2">
+            <label class="text-[#111418] dark:text-white text-base font-medium leading-normal">Escenarios de Trabajo</label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <?php foreach ($escenarios as $esc): ?>
+                    <label class="flex items-center gap-3 p-3 rounded-xl border border-gray-200 dark:border-[#3b4754] bg-white dark:bg-[#1c2127] hover:bg-gray-50 dark:hover:bg-[#2c3b4a] transition-colors cursor-pointer group">
+                        <div class="relative flex items-center">
+                            <input type="checkbox" name="escenarios[]" value="<?= $esc['id'] ?>" 
+                                class="w-5 h-5 rounded border-gray-300 text-primary focus:ring-primary dark:bg-slate-900 dark:border-slate-700"
+                                <?= (isset($esc['activo']) && $esc['activo'] == 1) ? 'checked' : '' ?>>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-sm font-medium text-gray-900 dark:text-white"><?= esc($esc['nombre']) ?></span>
+                        </div>
+                    </label>
+                <?php endforeach; ?>
+            </div>
+            <?php if (empty($escenarios)): ?>
+                <p class="text-xs text-text-secondary italic">No hay escenarios creados en el sistema.</p>
+            <?php endif; ?>
+        </div>
+
         <div class="mt-4">
             <button type="submit" class="w-full h-12 bg-primary hover:bg-blue-600 text-white font-bold rounded-lg shadow-lg flex items-center justify-center gap-2 transition-colors">
                 <span class="material-symbols-outlined text-[20px]">save</span>
