@@ -61,7 +61,7 @@
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <span class="material-symbols-outlined text-gray-400 group-focus-within:text-primary transition-colors" style="font-size: 20px;">mail</span>
                     </div>
-                    <input autocomplete="email" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#111418] dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/20 focus:border-primary border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#1a2026] h-12 placeholder:text-gray-400 dark:placeholder:text-[#637588] pl-11 pr-4 text-sm font-medium leading-normal transition-all" id="email" name="email" placeholder="usuario@ejemplo.com" required="" type="email"/>
+                    <input autocomplete="email" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#111418] dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/20 focus:border-primary border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#1a2026] h-12 placeholder:text-gray-400 dark:placeholder:text-[#637588] pl-14 pr-4 text-sm font-medium leading-normal transition-all" id="email" name="email" placeholder="usuario@ejemplo.com" required="" type="email"/>
                 </div>
             </div>
             <div class="flex flex-col w-full space-y-2">
@@ -73,7 +73,7 @@
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <span class="material-symbols-outlined text-gray-400 group-focus-within:text-primary transition-colors" style="font-size: 20px;">lock</span>
                     </div>
-                    <input autocomplete="current-password" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#111418] dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/20 focus:border-primary border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#1a2026] h-12 placeholder:text-gray-400 dark:placeholder:text-[#637588] pl-11 pr-12 text-sm font-medium leading-normal transition-all" id="password" name="password" placeholder="••••••••" required="" type="password"/>
+                    <input autocomplete="current-password" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#111418] dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/20 focus:border-primary border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#1a2026] h-12 placeholder:text-gray-400 dark:placeholder:text-[#637588] pl-14 pr-12 text-sm font-medium leading-normal transition-all" id="password" name="password" placeholder="••••••••" required="" type="password"/>
                     <button class="absolute inset-y-0 right-0 flex items-center justify-center px-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors focus:outline-none" type="button">
                         <span class="material-symbols-outlined" style="font-size: 20px;">visibility</span>
                     </button>
