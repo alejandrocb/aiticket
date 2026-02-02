@@ -71,3 +71,16 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('profile/updateAvatar', 'Profile::updateAvatar');
     $routes->post('profile/updateEscenarios', 'Profile::updateEscenarios');
 });
+
+// API Routes
+$routes->group('api', function($routes) {
+    $routes->get('clientes/list', 'Api::listClients');
+    $routes->post('clientes/create', 'Api::createClient');
+    
+    $routes->get('tickets/list', 'Api::listTickets');
+    $routes->post('tickets/create', 'Api::createTicket');
+    $routes->get('tickets/detail/(:num)', 'Api::getTicket/$1');
+    $routes->post('tickets/movements/add', 'Api::addMovement');
+    
+    $routes->get('metadata', 'Api::metadata');
+});
