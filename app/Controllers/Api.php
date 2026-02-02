@@ -124,6 +124,32 @@ class Api extends Controller
         }
     }
 
+    public function updateTicket()
+    {
+        $data = $this->getJsonInput();
+        
+        if (!isset($data['id'])) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Ticket ID is required']);
+        }
+        
+        $id = $data['id'];
+        unset($data['id']); // Remove ID from update data
+        
+        $model = new TicketModel();
+        
+        // Check if ticket exists
+        $ticket = $model->find($id);
+        if (!$ticket) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Ticket not found']);
+        }
+        
+        if ($model->update($id, $data)) {
+            return $this->response->setJSON(['status' => 'success', 'message' => 'Ticket updated']);
+        } else {
+            return $this->response->setJSON(['status' => 'error', 'errors' => $model->errors()]);
+        }
+    }
+
     // --- MOVIMIENTOS ---
 
     public function addMovement()
