@@ -79,6 +79,7 @@ $routes->group('api', function($routes) {
     
     $routes->get('tickets/list', 'Api::listTickets');
     $routes->post('tickets/create', 'Api::createTicket');
+    $routes->post('tickets/update', 'Api::updateTicket');
     $routes->get('tickets/detail/(:num)', 'Api::getTicket/$1');
     $routes->post('tickets/movements/add', 'Api::addMovement');
     
