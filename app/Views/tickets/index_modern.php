@@ -1,15 +1,89 @@
 <!-- tickets/index_modern.php -->
-<!-- Search and Filters for Tickets -->
+<!-- Search and Advanced Filters for Tickets -->
 <div class="px-0 py-2 pb-3">
     <label class="flex flex-col min-w-40 h-11 w-full">
         <div class="flex w-full flex-1 items-stretch rounded-xl h-full shadow-sm">
             <div class="text-text-secondary flex border-none bg-surface-light dark:bg-surface-dark items-center justify-center pl-4 rounded-l-xl border-r-0">
                 <span class="material-symbols-outlined text-[22px]">search</span>
             </div>
-            <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#111418] dark:text-white focus:outline-0 focus:ring-0 border-none bg-surface-light dark:bg-surface-dark focus:border-none h-full placeholder:text-text-secondary px-4 rounded-l-none border-l-0 pl-3 text-base font-normal leading-normal" placeholder="Buscar por palabra clave o ID..." value=""/>
+            <input id="search-input" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#111418] dark:text-white focus:outline-0 focus:ring-0 border-none bg-surface-light dark:bg-surface-dark focus:border-none h-full placeholder:text-text-secondary px-4 rounded-l-none border-l-0 pl-3 text-base font-normal leading-normal" placeholder="Buscar por palabra clave o ID..." value=""/>
         </div>
     </label>
 </div>
+
+<!-- Advanced Filters Toggle Button -->
+<div class="px-0 py-2 flex items-center justify-between">
+    <button id="toggle-filters-btn" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-surface-light dark:bg-surface-dark border border-[#e5e7eb] dark:border-transparent hover:bg-gray-100 dark:hover:bg-[#2c3b4a] transition-colors text-[#111418] dark:text-white">
+        <span class="material-symbols-outlined text-[20px]">tune</span>
+        <span class="text-sm font-medium">Filtros Avanzados</span>
+        <span id="filter-count" class="hidden ml-1 bg-primary text-white text-xs font-bold px-2 py-0.5 rounded-full">0</span>
+    </button>
+    <button id="clear-filters-btn" class="hidden items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors">
+        <span class="material-symbols-outlined text-[18px]">close</span>
+        Limpiar filtros
+    </button>
+</div>
+
+<!-- Advanced Filters Panel -->
+<div id="filters-panel" class="hidden px-0 py-3 mb-4 bg-surface-light dark:bg-surface-dark rounded-xl border border-[#e5e7eb] dark:border-transparent shadow-sm">
+    <form id="filters-form" method="get" action="/tickets" class="p-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Filtro por Fecha Desde -->
+            <div class="flex flex-col gap-2">
+                <label class="text-sm font-semibold text-[#111418] dark:text-white">Fecha Desde</label>
+                <input type="date" name="fecha_desde" id="filter-fecha-desde" value="<?= esc($filters['fecha_desde'] ?? '') ?>" class="px-3 py-2 rounded-lg border border-[#e5e7eb] dark:border-[#2c3b4a] bg-white dark:bg-[#1a2129] text-[#111418] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+            </div>
+
+            <!-- Filtro por Fecha Hasta -->
+            <div class="flex flex-col gap-2">
+                <label class="text-sm font-semibold text-[#111418] dark:text-white">Fecha Hasta</label>
+                <input type="date" name="fecha_hasta" id="filter-fecha-hasta" value="<?= esc($filters['fecha_hasta'] ?? '') ?>" class="px-3 py-2 rounded-lg border border-[#e5e7eb] dark:border-[#2c3b4a] bg-white dark:bg-[#1a2129] text-[#111418] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+            </div>
+
+            <!-- Filtro por Cliente -->
+            <div class="flex flex-col gap-2">
+                <label class="text-sm font-semibold text-[#111418] dark:text-white">Cliente</label>
+                <select name="cliente_id" id="filter-cliente" class="px-3 py-2 rounded-lg border border-[#e5e7eb] dark:border-[#2c3b4a] bg-white dark:bg-[#1a2129] text-[#111418] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                    <option value="all">Todos los clientes</option>
+                    <?php if (!empty($clientes)): ?>
+                        <?php foreach ($clientes as $cliente): ?>
+                            <option value="<?= $cliente['id'] ?>" <?= (isset($filters['cliente_id']) && $filters['cliente_id'] == $cliente['id']) ? 'selected' : '' ?>>
+                                <?= esc($cliente['nombre']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </select>
+            </div>
+
+            <!-- Filtro por Agente/Responsable -->
+            <div class="flex flex-col gap-2">
+                <label class="text-sm font-semibold text-[#111418] dark:text-white">Agente</label>
+                <select name="responsable_id" id="filter-responsable" class="px-3 py-2 rounded-lg border border-[#e5e7eb] dark:border-[#2c3b4a] bg-white dark:bg-[#1a2129] text-[#111418] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                    <option value="all">Todos los agentes</option>
+                    <?php if (!empty($usuarios)): ?>
+                        <?php foreach ($usuarios as $usuario): ?>
+                            <option value="<?= $usuario['id'] ?>" <?= (isset($filters['responsable_id']) && $filters['responsable_id'] == $usuario['id']) ? 'selected' : '' ?>>
+                                <?= esc($usuario['nombre']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </select>
+            </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="flex items-center gap-3 mt-4 pt-4 border-t border-[#e5e7eb] dark:border-[#2c3b4a]">
+            <button type="submit" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white font-medium text-sm hover:bg-primary/90 transition-colors shadow-sm">
+                <span class="material-symbols-outlined text-[18px]">filter_alt</span>
+                Aplicar Filtros
+            </button>
+            <button type="button" id="reset-filters-btn" class="px-4 py-2 rounded-lg border border-[#e5e7eb] dark:border-[#2c3b4a] text-[#111418] dark:text-white font-medium text-sm hover:bg-gray-100 dark:hover:bg-[#2c3b4a] transition-colors">
+                Resetear
+            </button>
+        </div>
+    </form>
+</div>
+
 <div class="flex gap-3 px-0 py-3 overflow-x-auto no-scrollbar items-center mb-4">
     <button id="btn-filter-open" class="filter-toggle-btn flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-primary pl-5 pr-5 shadow-lg shadow-primary/20 transition-transform active:scale-95 text-white" data-mode="open">
         <span class="material-symbols-outlined text-sm">lock_open</span>
@@ -166,7 +240,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.querySelector('input[placeholder="Buscar por palabra clave o ID..."]');
+    const searchInput = document.querySelector('#search-input');
     const ticketItems = document.querySelectorAll('.ticket-item');
     const filterBtns = document.querySelectorAll('.filter-toggle-btn');
     
@@ -176,11 +250,80 @@ document.addEventListener('DOMContentLoaded', function() {
     
     let currentMode = 'open'; // 'open' or 'closed'
 
+    // Advanced Filters Elements
+    const toggleFiltersBtn = document.getElementById('toggle-filters-btn');
+    const filtersPanel = document.getElementById('filters-panel');
+    const clearFiltersBtn = document.getElementById('clear-filters-btn');
+    const resetFiltersBtn = document.getElementById('reset-filters-btn');
+    const filterCount = document.getElementById('filter-count');
+
+    // Toggle Advanced Filters Panel
+    if (toggleFiltersBtn) {
+        toggleFiltersBtn.addEventListener('click', function() {
+            filtersPanel.classList.toggle('hidden');
+        });
+    }
+
+    // Reset Filters Button
+    if (resetFiltersBtn) {
+        resetFiltersBtn.addEventListener('click', function() {
+            document.getElementById('filter-fecha-desde').value = '';
+            document.getElementById('filter-fecha-hasta').value = '';
+            document.getElementById('filter-cliente').value = 'all';
+            document.getElementById('filter-responsable').value = 'all';
+            updateFilterCount();
+        });
+    }
+
+    // Clear Filters and Reload
+    if (clearFiltersBtn) {
+        clearFiltersBtn.addEventListener('click', function() {
+            window.location.href = '/tickets';
+        });
+    }
+
+    // Update Filter Count
+    function updateFilterCount() {
+        let count = 0;
+        const fechaDesde = document.getElementById('filter-fecha-desde').value;
+        const fechaHasta = document.getElementById('filter-fecha-hasta').value;
+        const cliente = document.getElementById('filter-cliente').value;
+        const responsable = document.getElementById('filter-responsable').value;
+
+        if (fechaDesde) count++;
+        if (fechaHasta) count++;
+        if (cliente && cliente !== 'all') count++;
+        if (responsable && responsable !== 'all') count++;
+
+        if (count > 0) {
+            filterCount.textContent = count;
+            filterCount.classList.remove('hidden');
+            clearFiltersBtn.classList.remove('hidden');
+            clearFiltersBtn.classList.add('flex');
+        } else {
+            filterCount.classList.add('hidden');
+            clearFiltersBtn.classList.add('hidden');
+            clearFiltersBtn.classList.remove('flex');
+        }
+    }
+
+    // Check for active filters on page load
+    updateFilterCount();
+
+    // Auto-open filters panel if filters are active
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('fecha_desde') || urlParams.has('fecha_hasta') || 
+        urlParams.has('cliente_id') || urlParams.has('responsable_id')) {
+        filtersPanel.classList.remove('hidden');
+    }
+
     // Init
     applyFilters();
 
     // Search Event
-    searchInput.addEventListener('input', applyFilters);
+    if (searchInput) {
+        searchInput.addEventListener('input', applyFilters);
+    }
 
     // Button Events
     filterBtns.forEach(btn => {

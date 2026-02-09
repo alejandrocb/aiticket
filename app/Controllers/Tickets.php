@@ -52,6 +52,18 @@ class Tickets extends Controller
              $tickets = $this->ticketModel->getTicketsWithClients(session()->get('cliente_id'));
         }
         
+        // --- Aplicar Filtros Avanzados ---
+        $filters = [
+            'fecha_desde' => $this->request->getGet('fecha_desde'),
+            'fecha_hasta' => $this->request->getGet('fecha_hasta'),
+            'cliente_id' => $this->request->getGet('cliente_id'),
+            'responsable_id' => $this->request->getGet('responsable_id'),
+        ];
+
+        if ($tickets) {
+            $tickets = $this->applyAdvancedFilters($tickets, $filters);
+        }
+        
         // --- Lógica Check 1: Marcar como Visto (visto_responsable_at) ---
         // Si el usuario actual es el responsable Y no lo ha visto aún
         if ($tickets) {
@@ -76,13 +88,66 @@ class Tickets extends Controller
             }
         }
 
+        // Obtener listas para los filtros
+        $clientes = $this->clienteModel->getClientes();
+        $usuarios = $this->usuarioModel->findAll();
+
         $data = [
             'title' => 'Listado de Tickets',
             'tickets' => $tickets,
+            'clientes' => $clientes,
+            'usuarios' => $usuarios,
+            'filters' => $filters,
             'content' => 'tickets/index_modern'
         ];
 
         return view('templates/layout_modern', $data);
+    }
+
+    /**
+     * Aplica filtros avanzados a los tickets
+     */
+    private function applyAdvancedFilters($tickets, $filters)
+    {
+        if (empty($tickets)) {
+            return $tickets;
+        }
+
+        return array_filter($tickets, function($ticket) use ($filters) {
+            // Filtro por fecha desde
+            if (!empty($filters['fecha_desde'])) {
+                $ticketDate = strtotime($ticket['fecha_creacion']);
+                $filterDate = strtotime($filters['fecha_desde']);
+                if ($ticketDate < $filterDate) {
+                    return false;
+                }
+            }
+
+            // Filtro por fecha hasta
+            if (!empty($filters['fecha_hasta'])) {
+                $ticketDate = strtotime($ticket['fecha_creacion']);
+                $filterDate = strtotime($filters['fecha_hasta'] . ' 23:59:59');
+                if ($ticketDate > $filterDate) {
+                    return false;
+                }
+            }
+
+            // Filtro por cliente
+            if (!empty($filters['cliente_id']) && $filters['cliente_id'] !== 'all') {
+                if ($ticket['cliente_id'] != $filters['cliente_id']) {
+                    return false;
+                }
+            }
+
+            // Filtro por responsable/agente
+            if (!empty($filters['responsable_id']) && $filters['responsable_id'] !== 'all') {
+                if ($ticket['responsable_id'] != $filters['responsable_id']) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
     }
     public function store()
     {
