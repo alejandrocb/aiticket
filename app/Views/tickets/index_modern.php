@@ -31,19 +31,35 @@
             <!-- Filtro por Fecha Desde -->
             <div class="flex flex-col gap-2">
                 <label class="text-sm font-semibold text-[#111418] dark:text-white">Fecha Desde</label>
-                <input type="date" name="fecha_desde" id="filter-fecha-desde" value="<?= esc($filters['fecha_desde'] ?? '') ?>" class="px-3 py-2 rounded-lg border border-[#e5e7eb] dark:border-[#2c3b4a] bg-white dark:bg-[#1a2129] text-[#111418] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                <input 
+                    type="date" 
+                    name="fecha_desde" 
+                    id="filter-fecha-desde" 
+                    value="<?= esc($filters['fecha_desde'] ?? '') ?>" 
+                    class="form-filter"
+                >
             </div>
 
             <!-- Filtro por Fecha Hasta -->
             <div class="flex flex-col gap-2">
                 <label class="text-sm font-semibold text-[#111418] dark:text-white">Fecha Hasta</label>
-                <input type="date" name="fecha_hasta" id="filter-fecha-hasta" value="<?= esc($filters['fecha_hasta'] ?? '') ?>" class="px-3 py-2 rounded-lg border border-[#e5e7eb] dark:border-[#2c3b4a] bg-white dark:bg-[#1a2129] text-[#111418] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                <input 
+                    type="date" 
+                    name="fecha_hasta" 
+                    id="filter-fecha-hasta" 
+                    value="<?= esc($filters['fecha_hasta'] ?? '') ?>" 
+                    class="form-filter"
+                >
             </div>
 
             <!-- Filtro por Cliente -->
             <div class="flex flex-col gap-2">
                 <label class="text-sm font-semibold text-[#111418] dark:text-white">Cliente</label>
-                <select name="cliente_id" id="filter-cliente" class="px-3 py-2 rounded-lg border border-[#e5e7eb] dark:border-[#2c3b4a] bg-white dark:bg-[#1a2129] text-[#111418] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                <select 
+                    name="cliente_id" 
+                    id="filter-cliente" 
+                    class="form-filter-select"
+                >
                     <option value="all">Todos los clientes</option>
                     <?php if (!empty($clientes)): ?>
                         <?php foreach ($clientes as $cliente): ?>
@@ -58,7 +74,11 @@
             <!-- Filtro por Agente/Responsable -->
             <div class="flex flex-col gap-2">
                 <label class="text-sm font-semibold text-[#111418] dark:text-white">Agente</label>
-                <select name="responsable_id" id="filter-responsable" class="px-3 py-2 rounded-lg border border-[#e5e7eb] dark:border-[#2c3b4a] bg-white dark:bg-[#1a2129] text-[#111418] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary text-sm">
+                <select 
+                    name="responsable_id" 
+                    id="filter-responsable" 
+                    class="form-filter-select"
+                >
                     <option value="all">Todos los agentes</option>
                     <?php if (!empty($usuarios)): ?>
                         <?php foreach ($usuarios as $usuario): ?>
@@ -66,6 +86,7 @@
                                 <?= esc($usuario['nombre']) ?>
                             </option>
                         <?php endforeach; ?>
+
                     <?php endif; ?>
                 </select>
             </div>

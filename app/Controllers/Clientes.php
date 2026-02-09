@@ -43,7 +43,28 @@ class Clientes extends Controller
         echo view('templates/layout_modern', $data);
 
     }
-    // ... store ...
+
+    public function store()
+    {
+        $data = [
+            'nombre' => $this->request->getPost('nombre'),
+            'email' => $this->request->getPost('email'),
+            'telefono' => $this->request->getPost('telefono'),
+            'direccion' => $this->request->getPost('direccion'),
+            'escenario' => $this->request->getPost('escenario_id')
+        ];
+
+        // Validación básica
+        if (empty($data['nombre'])) {
+            return redirect()->back()->withInput()->with('errors', 'El nombre es obligatorio.');
+        }
+
+        if ($this->clienteModel->insert($data)) {
+            return redirect()->to('/clientes')->with('success', 'Cliente creado correctamente.');
+        } else {
+            return redirect()->back()->withInput()->with('errors', $this->clienteModel->errors());
+        }
+    }
 
     public function edit($id)
     {
