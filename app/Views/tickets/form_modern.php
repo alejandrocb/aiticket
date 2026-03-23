@@ -118,7 +118,7 @@
         </div>
 
         <div class="fixed bottom-0 left-0 right-0 p-4 bg-background-light dark:bg-background-dark border-t border-gray-200 dark:border-[#222a33] z-40 md:static md:bg-transparent md:border-none md:p-0 md:mt-4">
-            <button type="submit" class="w-full h-12 bg-primary hover:bg-blue-600 text-white font-bold rounded-lg shadow-lg flex items-center justify-center gap-2 transition-colors">
+            <button id="btn-submit-ticket" type="submit" class="w-full h-12 bg-primary hover:bg-blue-600 text-white font-bold rounded-lg shadow-lg flex items-center justify-center gap-2 transition-colors">
                 <span class="material-symbols-outlined text-[20px]">add_circle</span>
                 <?= isset($ticket) ? 'Actualizar Ticket' : 'Crear Ticket' ?>
             </button>
@@ -127,6 +127,13 @@
 </div>
 
 <script>
+// Evitar envíos duplicados del formulario
+document.querySelector('form').addEventListener('submit', function() {
+    const btn = document.getElementById('btn-submit-ticket');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="material-symbols-outlined text-[20px] animate-spin">progress_activity</span> <?= isset($ticket) ? "Actualizando..." : "Creando..." ?>';
+});
+
 let selectedFiles = [];
 
 document.getElementById('dropzone-file').addEventListener('change', function(e) {
