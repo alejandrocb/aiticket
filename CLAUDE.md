@@ -63,10 +63,12 @@ Los tickets y movimientos crean notificaciones para `usuario_id` y `responsable_
 
 Van a `FCPATH . 'upload/'` (o sea `public/upload/`), no a `writable/`: `upload/tickets/{ticketId}/` para adjuntos y `upload/avatars/` para fotos de perfil. `public/upload/` está en `.gitignore`, así que en un clon nuevo el directorio no existe y las imágenes referenciadas en BD aparecerán rotas.
 
+Ese directorio estuvo versionado por error (624 adjuntos reales de clientes, 196 MB) y se purgó del historial junto con las credenciales. **No lo vuelvas a añadir al repositorio**: son datos personales de terceros y el repositorio es público.
+
 ## Trampas conocidas
 
-- **Credenciales de producción hardcodeadas** en [app/Config/Database.php](app/Config/Database.php) (host, usuario y contraseña reales, con otro par comentado) y en un duplicado huérfano en la raíz, [Database.php](Database.php). Además `.env.production` está en `.gitignore` **pero versionado**, con la contraseña de BD y `MIGRATION_TOKEN`. Hay que rotarlas y sacarlas del repo; no las reproduzcas en código nuevo ni en respuestas.
-- **No hay fichero `env` de plantilla** pese a que el README dice copiarlo. Para arrancar en local hay que crear `.env` a mano: `app.baseURL`, `database.default.*`, `SIMM_API_KEY`, `VAPID_SUBJECT` / `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY`.
+- **Nunca escribas credenciales en el código.** El repositorio es público y ya arrastró una fuga: contraseña de BD, `MIGRATION_TOKEN` y clave API estaban en `app/Config/Database.php`, en un duplicado huérfano en la raíz y en `.env.production` versionado. El 2026-08-28 se purgó el historial completo (`git filter-branch` + force-push a `main`, `develop` y `chore/retirar-deploy-ftp-y-uploads`) y todo pasó a `.env`. Cualquier secreto va al `.env`, nunca a un fichero versionado, y tampoco a los `.md` como "ejemplo".
+- Para arrancar en local hay que copiar la plantilla [env](env) a `.env` y rellenarla: `app.baseURL`, `database.default.*`, `SIMM_API_KEY`, `VAPID_SUBJECT` / `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY`, `MIGRATION_TOKEN`. Sin `.env` la conexión falla con "Access denied" y la API responde 401 a todo.
 - **`public/assets/` está gitignoreado pero el layout lo referencia**: `assets/js/push-handler.js` y `assets/images/icon-192.png` no existen en el clon, así que el push nunca arranca (`PushHandler is undefined`) hasta que se regeneren esos ficheros.
 - **`database/schema.sql` está incompleto**: no incluye `notifications` ni `push_subscriptions`, que sólo existen vía migraciones. Tras importar el schema hay que ejecutar `php spark migrate`.
 - **IDs de estado hardcodeados** por todo el código: `3` = Cerrado, y `11` se excluye junto al 3 en los listados de abiertos/programados. Al tocar `estados_ticket` hay que respetar esos IDs.
