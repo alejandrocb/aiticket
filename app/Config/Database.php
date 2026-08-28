@@ -23,15 +23,26 @@ class Database extends Config
 
     /**
      * The default database connection.
+     *
+     * Las credenciales NO se escriben aquí: se leen del fichero `.env`, que
+     * nunca se versiona. CodeIgniter sobrescribe cada clave de este array con
+     * la variable de entorno del mismo nombre:
+     *
+     *     database.default.hostname = ...
+     *     database.default.database = ...
+     *     database.default.username = ...
+     *     database.default.password = ...
+     *     database.default.port     = 3306
+     *
+     * Parte de `env` como plantilla. Si la conexión falla con "Access denied"
+     * o "Unknown database", lo que falta es el `.env`, no este fichero.
      */
     public array $default = [
         'DSN'          => '',
-        'hostname'     => 'REDACTED',
-        //'username'     => 'REDACTED',
-        //'password'     => 'REDACTED',
-        'username'     => 'REDACTED',
-        'password'     => 'REDACTED',
-        'database'     => 'REDACTED',
+        'hostname'     => '',
+        'username'     => '',
+        'password'     => '',
+        'database'     => '',
         'DBDriver'     => 'MySQLi',
         'DBPrefix'     => '',
         'pConnect'     => false,

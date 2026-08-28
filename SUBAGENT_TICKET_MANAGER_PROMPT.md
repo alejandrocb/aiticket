@@ -399,6 +399,6 @@ Antes de desplegar, reemplaza estas variables:
 | Variable | Descripcion | Ejemplo |
 |----------|-------------|---------|
 | `{{BASE_URL}}` | URL base de tu API (sin barra final) | `https://tickets.tudominio.com/api` |
-| `{{API_KEY}}` | Tu clave API (valor de SIMM_API_KEY en .env) | `REDACTED` |
+| `{{API_KEY}}` | Tu clave API (valor de SIMM_API_KEY en .env) | `<tu_clave_api>` |
 | `{{BOT_USER_ID}}` | ID del usuario "bot" en la tabla usuarios | `1` |
 | `{{ESCENARIO_DEFAULT}}` | ID del escenario por defecto | `1` |

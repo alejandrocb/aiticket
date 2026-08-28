@@ -12,7 +12,8 @@
 /writable/debugbar/
 /tests/_support/_generated
 /.env
-/.env.production
+/.env.*
+!/env
 /local/
 /public/upload/
 

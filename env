@@ -1,0 +1,66 @@
+#--------------------------------------------------------------------
+# PLANTILLA DE ENTORNO
+#--------------------------------------------------------------------
+#
+# Copia este fichero a `.env` y rellena los valores. `.env` está en
+# .gitignore y NUNCA debe versionarse: es el único sitio donde viven
+# las credenciales.
+#
+#   cp env .env      (Linux/macOS)
+#   copy env .env    (Windows)
+#
+# Estas variables sobrescriben lo que haya en app/Config/*.php.
+
+#--------------------------------------------------------------------
+# ENTORNO
+#--------------------------------------------------------------------
+
+CI_ENVIRONMENT = development
+# En producción: CI_ENVIRONMENT = production
+
+#--------------------------------------------------------------------
+# APP
+#--------------------------------------------------------------------
+
+app.baseURL = 'http://localhost:8080/'
+# app.forceGlobalSecureRequests = true   # exige HTTPS (recomendado en producción)
+
+#--------------------------------------------------------------------
+# BASE DE DATOS
+#--------------------------------------------------------------------
+
+database.default.hostname =
+database.default.database =
+database.default.username =
+database.default.password =
+database.default.DBDriver = MySQLi
+database.default.port = 3306
+
+#--------------------------------------------------------------------
+# API REST  (cabecera X-API-KEY, ver API_GUIDE_FOR_AI.md)
+#--------------------------------------------------------------------
+#
+# Genera una clave larga y aleatoria, por ejemplo:
+#   php -r "echo bin2hex(random_bytes(32));"
+# Si esta variable está vacía, la API rechaza TODAS las peticiones con 401.
+
+SIMM_API_KEY =
+
+#--------------------------------------------------------------------
+# NOTIFICACIONES PUSH (VAPID)
+#--------------------------------------------------------------------
+#
+# Genera el par de claves con:
+#   php -r "require 'vendor/autoload.php'; print_r(Minishlink\WebPush\VAPID::createVapidKeys());"
+
+VAPID_SUBJECT = 'mailto:admin@example.com'
+VAPID_PUBLIC_KEY =
+VAPID_PRIVATE_KEY =
+
+#--------------------------------------------------------------------
+# DESPLIEGUE
+#--------------------------------------------------------------------
+#
+# Token que protege la ejecución remota de migraciones.
+
+MIGRATION_TOKEN =
