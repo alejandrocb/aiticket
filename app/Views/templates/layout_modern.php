@@ -21,7 +21,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Aiticket">
-    <link rel="apple-touch-icon" href="<?= base_url('assets/images/icon-192.png') ?>">
+    <link rel="apple-touch-icon" href="<?= base_url('images/icon-192.png') ?>">
     
     <link href="https://fonts.googleapis.com" rel="preconnect"/>
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
@@ -273,7 +273,7 @@
     });
 </script>
     <!-- Push Notifications -->
-    <script src="<?= base_url('assets/js/push-handler.js?v=' . time()) ?>"></script>
+    <script src="<?= base_url('js/push-handler.js?v=' . filemtime(FCPATH . 'js/push-handler.js')) ?>"></script>
     <script>
         console.log("Aiticket: Cargando scripts de Push...");
         document.addEventListener('DOMContentLoaded', function() {

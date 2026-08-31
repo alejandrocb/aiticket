@@ -1,28 +1,43 @@
-// sw.js - Service Worker for Aiticket
-const CACHE_NAME = 'aiticket-v6';
-const ASSETS_TO_CACHE = [
-    './',
-    'assets/images/icon-192.png',
-    'assets/images/icon-512.png',
-    'assets/images/badge-white.png',
-    'favicon.ico'
-];
+// sw.js - Service Worker de Aiticket
+//
+// Su cometido aquí es recibir notificaciones push. No precarga nada: la
+// versión anterior cacheaba tres iconos bajo assets/images/ que no existen en
+// el repositorio, y cache.addAll() es todo o nada, así que el evento install
+// fallaba y el service worker no llegaba a activarse nunca. Sin service worker
+// activo no hay push posible.
+const CACHE_NAME = 'aiticket-v7';
 
-// Install Event
 self.addEventListener('install', event => {
+    // Sin espera: al no precargar nada, no hay motivo para retrasar la
+    // activación tras una actualización.
+    self.skipWaiting();
+});
+
+self.addEventListener('activate', event => {
+    // Se limpian las cachés de versiones anteriores, que contenían la portada
+    // y la servían indefinidamente.
     event.waitUntil(
-        caches.open(CACHE_NAME).then(cache => {
-            return cache.addAll(ASSETS_TO_CACHE);
-        })
+        caches.keys()
+            .then(nombres => Promise.all(
+                nombres.filter(n => n !== CACHE_NAME).map(n => caches.delete(n))
+            ))
+            .then(() => self.clients.claim())
     );
 });
 
-// Fetch Event (for offline support)
+// Red primero, con la caché solo como último recurso.
+//
+// La versión anterior respondía desde caché antes que desde la red y tenía la
+// portada precargada, así que servía una copia congelada del panel. En un
+// puesto de mando, ver un listado de incidencias desactualizado es peor que no
+// verlo, de modo que aquí la red siempre manda.
 self.addEventListener('fetch', event => {
+    if (event.request.method !== 'GET') {
+        return;
+    }
+
     event.respondWith(
-        caches.match(event.request).then(response => {
-            return response || fetch(event.request);
-        })
+        fetch(event.request).catch(() => caches.match(event.request))
     );
 });
 
@@ -36,8 +51,12 @@ self.addEventListener('push', function (event) {
     const title = data.title || 'Aiticket';
     const options = {
         body: data.body || 'Tienes una nueva notificación.',
-        icon: data.userPhoto || 'assets/images/icon-192.png',  // Foto del usuario si existe, si no, logo de la app
-        badge: 'assets/images/badge-white.png',  // Logo monocromo (esquina y barra de estado móvil)
+        // Foto de quien provoca el aviso; si no la hay, el logotipo de la
+        // aplicación. Van bajo images/, que sí está versionado. Si el fichero
+        // no existe el navegador simplemente no pinta el icono: ya no es un
+        // fallo que impida instalar el service worker.
+        icon: data.userPhoto || 'images/icon-192.png',
+        badge: 'images/badge.png',
         image: data.image || null,  // Imagen del ticket o movimiento (grande)
         vibrate: [200, 100, 200],
         tag: data.tag || 'aiticket-notification',
