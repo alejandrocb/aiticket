@@ -8,7 +8,7 @@ class ClienteModel extends Model
     protected $primaryKey = 'id';
 
     protected $useAutoIncrement = true;
-    protected $allowedFields = ['nombre', 'email', 'telefono', 'direccion', 'escenario'];
+    protected $allowedFields = ['nombre', 'email', 'telefono', 'direccion', 'escenario', 'responsable_defecto_id'];
 
     protected $useTimestamps = false;
 

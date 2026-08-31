@@ -37,6 +37,40 @@ class NotificationModel extends Model
         return $data;
     }
 
+    /**
+     * Crea una notificación por cada destinatario final.
+     *
+     * A los destinatarios que se le pasen añade siempre los usuarios marcados
+     * con `recibe_todas_notificaciones` —Dirección en el Puesto de Mando—, que
+     * deben enterarse de todo pase lo que pase.
+     *
+     * Descarta a `$autorId`: quien acaba de hacer el cambio no necesita que le
+     * avisen de su propia acción. Si Dirección es quien lo hace, tampoco se
+     * autonotifica.
+     *
+     * @param array $destinatarios ids de usuario; se admiten nulos y repetidos
+     * @param array $datos         campos de la notificación, sin `user_id`
+     * @param int|null $autorId    quien provoca el aviso, para excluirlo
+     *
+     * @return int número de notificaciones creadas
+     */
+    public function notificarA(array $destinatarios, array $datos, $autorId = null): int
+    {
+        $usuarioModel = new UsuarioModel();
+        $direccion    = $usuarioModel->where('recibe_todas_notificaciones', 1)->findColumn('id') ?? [];
+
+        $finales = array_unique(array_filter(
+            array_merge($destinatarios, $direccion),
+            static fn($id) => ! empty($id) && $id != $autorId
+        ));
+
+        foreach ($finales as $userId) {
+            $this->insert(array_merge($datos, ['user_id' => $userId]));
+        }
+
+        return count($finales);
+    }
+
     public function getUnreadCount($userId)
     {
         return $this->where('user_id', $userId)

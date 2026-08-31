@@ -228,28 +228,33 @@ class Tickets extends Controller
                 $ticketModel->update($ticketId, ['media' => json_encode($mediaFiles)]);
             }
 
-            // 5. Notificar al Responsable (si es diferente al creador)
-            if (!empty($data['responsable_id']) && $data['responsable_id'] != session()->get('id')) {
-                 $firstImg = null;
-                 if (!empty($mediaFiles)) {
-                     foreach ($mediaFiles as $m) {
-                         if ($m['type'] === 'image') {
-                             $firstImg = $m['filename'];
-                             break;
-                         }
-                     }
-                 }
+            // 5. Notificar al responsable y a Dirección.
+            //    Sin condición previa: aunque el responsable sea el propio
+            //    creador —lo habitual en el PMA, donde cada grupo da de alta
+            //    sus incidencias— Dirección tiene que enterarse igual.
+            //    notificarA() ya descarta al autor de la acción.
+            $firstImg = null;
+            if (!empty($mediaFiles)) {
+                foreach ($mediaFiles as $m) {
+                    if ($m['type'] === 'image') {
+                        $firstImg = $m['filename'];
+                        break;
+                    }
+                }
+            }
 
-                 $this->notificationModel->insert([
-                    'user_id'    => $data['responsable_id'],
+            $this->notificationModel->notificarA(
+                [$data['responsable_id'] ?? null],
+                [
                     'title'      => 'Nuevo Ticket Asignado',
                     'message'    => $data['descripcion'],
                     'link'       => "/tickets/detail/{$ticketId}",
                     'icon'       => session()->get('imagen'),
                     'image'      => $firstImg,
-                    'created_at' => date('Y-m-d H:i:s')
-                ]);
-            }
+                    'created_at' => date('Y-m-d H:i:s'),
+                ],
+                session()->get('id')
+            );
 
             return redirect()->to('/tickets')->with('success', 'Ticket creado correctamente.');
         } else {
@@ -362,24 +367,24 @@ class Tickets extends Controller
         if (isset($data['descripcion'])) {
             $notifMessage = $data['descripcion'];
         } elseif (isset($data['estado_ticket_id']) && $data['estado_ticket_id'] != $oldTicket['estado_ticket_id']) {
-            $estadoModel = new \App\Models\EstadoTicketModel();
-            $nuevoEstado = $estadoModel->find($data['estado_ticket_id']);
+            $nuevoEstado = $this->estadosTicketModel->find($data['estado_ticket_id']);
             $notifMessage = "Estado cambiado a: " . ($nuevoEstado['nombre'] ?? 'Nuevo estado');
         } elseif (!empty($mediaFiles)) {
             $notifMessage = "Se han añadido nuevos archivos adjuntos.";
         }
 
-        foreach ($recipients as $recipientId) {
-            $this->notificationModel->insert([
-                'user_id' => $recipientId,
-                'title' => 'Ticket Actualizado',
-                'message' => $notifMessage,
-                'link' => "/tickets/detail/{$id}",
-                'icon' => session()->get('imagen'),
-                'image' => $firstImg,
-                'created_at' => date('Y-m-d H:i:s')
-            ]);
-        }
+        $this->notificationModel->notificarA(
+            $recipients,
+            [
+                'title'      => 'Ticket Actualizado',
+                'message'    => $notifMessage,
+                'link'       => "/tickets/detail/{$id}",
+                'icon'       => session()->get('imagen'),
+                'image'      => $firstImg,
+                'created_at' => date('Y-m-d H:i:s'),
+            ],
+            $currentUserId
+        );
 
         // Comprobar cambios en el responsable
         if (isset($data['responsable_id']) && $data['responsable_id'] != $oldTicket['responsable_id']) {

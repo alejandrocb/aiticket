@@ -4,17 +4,20 @@ namespace App\Controllers;
 
 use App\Models\ClienteModel;
 use App\Models\EscenarioModel;
+use App\Models\UsuarioModel;
 use CodeIgniter\Controller;
 
 class Clientes extends Controller
 {
     protected $clienteModel;
     protected $escenarioModel;
+    protected $usuarioModel;
 
     public function __construct()
     {
         $this->clienteModel = new ClienteModel();
         $this->escenarioModel = new EscenarioModel();
+        $this->usuarioModel = new UsuarioModel();
     }
 
     public function index()
@@ -37,6 +40,7 @@ class Clientes extends Controller
         $data = [
             'title' => 'Crear Cliente',
             'escenarios' => $escenarios,
+            'usuarios' => $this->usuarioModel->findAll(),
             'content' => 'clientes/form_modern'
         ];
 
@@ -51,7 +55,8 @@ class Clientes extends Controller
             'email' => $this->request->getPost('email'),
             'telefono' => $this->request->getPost('telefono'),
             'direccion' => $this->request->getPost('direccion'),
-            'escenario' => $this->request->getPost('escenario_id')
+            'escenario' => $this->request->getPost('escenario_id'),
+            'responsable_defecto_id' => $this->request->getPost('responsable_defecto_id') ?: null
         ];
 
         // Validación básica
@@ -71,6 +76,7 @@ class Clientes extends Controller
         $data = [
             'title' => 'Editar Cliente',
             'cliente' => $this->clienteModel->find($id),
+            'usuarios' => $this->usuarioModel->findAll(),
             'content' => 'clientes/form_modern'
         ];
 
@@ -83,7 +89,8 @@ class Clientes extends Controller
             'nombre' => $this->request->getPost('nombre'),
             'email' => $this->request->getPost('email'),
             'telefono' => $this->request->getPost('telefono'),
-            'direccion' => $this->request->getPost('direccion')
+            'direccion' => $this->request->getPost('direccion'),
+            'responsable_defecto_id' => $this->request->getPost('responsable_defecto_id') ?: null
         ];
 
         $this->clienteModel->update($id, $data);

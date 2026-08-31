@@ -21,7 +21,7 @@
                     <select class="w-full appearance-none rounded-lg border border-gray-300 dark:border-[#3b4754] bg-white dark:bg-[#1c2127] text-[#111418] dark:text-white h-14 px-4 pr-10 text-base font-normal focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors" name="cliente_id" required>
                         <option disabled="" selected="" value="">Seleccionar Cliente</option>
                         <?php foreach ($clientes as $cliente): ?>
-                            <option value="<?= $cliente['id'] ?>" <?= (isset($ticket) && $ticket['cliente_id'] == $cliente['id']) ? 'selected' : '' ?>><?= $cliente['nombre'] ?></option>
+                            <option value="<?= $cliente['id'] ?>" data-responsable="<?= esc($cliente['responsable_defecto_id'] ?? '') ?>" <?= (isset($ticket) && $ticket['cliente_id'] == $cliente['id']) ? 'selected' : '' ?>><?= $cliente['nombre'] ?></option>
                         <?php endforeach; ?>
                     </select>
                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#9dabb9]">
@@ -53,7 +53,7 @@
                     <select class="w-full appearance-none rounded-lg border border-gray-300 dark:border-[#3b4754] bg-white dark:bg-[#1c2127] text-[#111418] dark:text-white h-14 px-4 pr-10 text-base font-normal focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors" name="tipo_ticket_id" required>
                         <option disabled="" selected="" value="">Seleccione tipo</option>
                          <?php foreach ($tipos as $tipo): ?>
-                            <option value="<?= $tipo['id'] ?>" <?= (isset($ticket) ? ($ticket['tipo_ticket_id'] == $tipo['id']) : (1 == $tipo['id'])) ? 'selected' : '' ?>><?= $tipo['nombre'] ?></option>
+                            <option value="<?= $tipo['id'] ?>" data-cliente="<?= esc($tipo['cliente_id'] ?? '') ?>" <?= (isset($ticket) && $ticket['tipo_ticket_id'] == $tipo['id']) ? 'selected' : '' ?>><?= $tipo['nombre'] ?></option>
                         <?php endforeach; ?>
                     </select>
                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#9dabb9]">
@@ -198,4 +198,66 @@ function updateInput() {
     selectedFiles.forEach(file => dt.items.add(file));
     document.getElementById('dropzone-file').files = dt.files;
 }
+</script>
+
+<script>
+/**
+ * Los tipos de incidencia cuelgan del cliente: cada uno tiene su propio
+ * catálogo. Filtramos en el navegador con los datos que ya vienen en el HTML,
+ * sin ida y vuelta al servidor, para que el alta sea inmediata.
+ *
+ * Un tipo con data-cliente vacío es global y aparece siempre.
+ */
+(function () {
+    const selCliente     = document.querySelector('select[name="cliente_id"]');
+    const selTipo        = document.querySelector('select[name="tipo_ticket_id"]');
+    const selResponsable = document.querySelector('select[name="responsable_id"]');
+
+    if (!selCliente || !selTipo) return;
+
+    // Guardamos las opciones antes de quitar ninguna del DOM.
+    const todosLosTipos = Array.from(selTipo.querySelectorAll('option[data-cliente]'));
+
+    function filtrarTipos() {
+        const clienteId  = selCliente.value;
+        const seleccion  = selTipo.value;
+
+        todosLosTipos.forEach(op => op.remove());
+
+        const visibles = todosLosTipos.filter(op => {
+            const duenyo = op.dataset.cliente;
+            return duenyo === '' || duenyo === clienteId;
+        });
+
+        visibles.forEach(op => selTipo.appendChild(op));
+
+        // Conservamos lo elegido si sigue siendo válido para el nuevo cliente.
+        if (visibles.some(op => op.value === seleccion)) {
+            selTipo.value = seleccion;
+        } else {
+            selTipo.selectedIndex = 0;
+        }
+    }
+
+    function aplicarResponsablePorDefecto() {
+        if (!selResponsable) return;
+
+        const opCliente = selCliente.options[selCliente.selectedIndex];
+        const porDefecto = opCliente ? opCliente.dataset.responsable : '';
+        if (!porDefecto) return;
+
+        // Solo si ese usuario está entre los asignables; si no, lo dejamos como está.
+        const existe = Array.from(selResponsable.options).some(o => o.value === porDefecto);
+        if (existe) selResponsable.value = porDefecto;
+    }
+
+    selCliente.addEventListener('change', function () {
+        filtrarTipos();
+        aplicarResponsablePorDefecto();
+    });
+
+    // Al cargar filtramos, pero no tocamos el responsable: si estamos editando,
+    // el ticket ya tiene el suyo y no debe perderlo.
+    filtrarTipos();
+})();
 </script>

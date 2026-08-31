@@ -171,17 +171,18 @@ class TicketMovimientos extends ResourceController
             $message = "Se han añadido archivos adjuntos";
         }
 
-        foreach ($recipients as $recipientId) {
-            $notificationModel->insert([
-                'user_id' => $recipientId,
-                'title' => 'Actualización de Ticket',
-                'message' => $message,
-                'link' => "/tickets/detail/{$ticketId}",
-                'icon' => session()->get('imagen'),
-                'image' => $firstImage,
-                'created_at' => date('Y-m-d H:i:s')
-            ]);
-        }
+        $notificationModel->notificarA(
+            $recipients,
+            [
+                'title'      => 'Actualización de Ticket',
+                'message'    => $message,
+                'link'       => "/tickets/detail/{$ticketId}",
+                'icon'       => session()->get('imagen'),
+                'image'      => $firstImage,
+                'created_at' => date('Y-m-d H:i:s'),
+            ],
+            $currentUserId
+        );
 
         if ($shouldRedirectToList) {
             return redirect()->to('/tickets')->with('mensaje', 'Ticket actualizado correctamente.');

@@ -45,6 +45,22 @@
                 </div>
             </div>
             <?php endif; ?>
+
+            <div class="flex flex-col gap-2">
+                <label class="text-[#111418] dark:text-white text-base font-medium leading-normal">Responsable por defecto</label>
+                <div class="relative">
+                    <select class="w-full appearance-none rounded-lg border border-gray-300 dark:border-[#3b4754] bg-white dark:bg-[#1c2127] text-[#111418] dark:text-white h-14 px-4 pr-10 text-base font-normal focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors" name="responsable_defecto_id">
+                        <option value="">Sin responsable por defecto</option>
+                        <?php foreach (($usuarios ?? []) as $usuario): ?>
+                            <option value="<?= $usuario['id'] ?>" <?= (isset($cliente) && $cliente['responsable_defecto_id'] == $usuario['id']) ? 'selected' : '' ?>><?= esc($usuario['nombre']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#9dabb9]">
+                        <span class="material-symbols-outlined">person</span>
+                    </div>
+                </div>
+                <p class="text-[#9dabb9] text-xs">Al crear una incidencia para este cliente, el responsable se asignará solo. Se puede cambiar después.</p>
+            </div>
         </div>
 
         <div class="fixed bottom-0 left-0 right-0 p-4 bg-background-light dark:bg-background-dark border-t border-gray-200 dark:border-[#222a33] z-40 md:static md:bg-transparent md:border-none md:p-0 md:mt-4">

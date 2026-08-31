@@ -37,6 +37,18 @@
             </div>
         </div>
 
+        <div class="flex flex-col gap-2 mt-2">
+            <label class="flex items-start gap-3 p-3 rounded-xl border border-gray-200 dark:border-[#3b4754] bg-white dark:bg-[#1c2127] hover:bg-gray-50 dark:hover:bg-[#2c3b4a] transition-colors cursor-pointer">
+                <input type="checkbox" name="recibe_todas_notificaciones" value="1"
+                    class="w-5 h-5 mt-0.5 rounded border-gray-300 text-primary focus:ring-primary dark:bg-slate-900 dark:border-slate-700"
+                    <?= (isset($usuario) && $usuario['recibe_todas_notificaciones']) ? 'checked' : '' ?>>
+                <div class="flex flex-col">
+                    <span class="text-[#111418] dark:text-white text-base font-medium leading-normal">Recibe todas las notificaciones</span>
+                    <span class="text-[#9dabb9] text-xs">Para Dirección: le llega cualquier alta o cambio, sea quien sea el creador o el responsable.</span>
+                </div>
+            </label>
+        </div>
+
         <div class="flex flex-col gap-3 mt-2">
             <label class="text-[#111418] dark:text-white text-base font-medium leading-normal">Escenarios de Trabajo</label>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">

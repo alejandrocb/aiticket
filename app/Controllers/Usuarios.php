@@ -47,6 +47,7 @@ class Usuarios extends ResourceController
             'email'    => $this->request->getPost('email'),
             'password' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
             'tipo_usuario_id' => $this->request->getPost('tipo_usuario_id'),
+            'recibe_todas_notificaciones' => $this->request->getPost('recibe_todas_notificaciones') ? 1 : 0,
         ];
 
         $db = \Config\Database::connect();
@@ -105,6 +106,7 @@ class Usuarios extends ResourceController
             'nombre'   => $this->request->getPost('nombre'),
             'email'    => $this->request->getPost('email'),
             'tipo_usuario_id' => $this->request->getPost('tipo_usuario_id'),
+            'recibe_todas_notificaciones' => $this->request->getPost('recibe_todas_notificaciones') ? 1 : 0,
         ];
 
         $password = $this->request->getPost('password');

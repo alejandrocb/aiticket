@@ -7,7 +7,7 @@ class TiposticketModel extends Model
     protected $table = 'tipos_ticket';
     protected $primaryKey = 'id';
     
-    protected $allowedFields = ['nombre'];
+    protected $allowedFields = ['nombre', 'cliente_id'];
     
     protected $returnType = 'array';
     protected $useTimestamps = false;

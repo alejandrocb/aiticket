@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\TiposticketModel;
+use App\Models\ClienteModel;
 use CodeIgniter\RESTful\ResourceController;
 
 class TiposTicket extends ResourceController
@@ -28,6 +29,7 @@ class TiposTicket extends ResourceController
     {
         $data = [
             'title' => 'Crear Tipo de Ticket',
+            'clientes' => (new ClienteModel())->getClientes(),
             'resource_name' => 'tiposticket',
             'singular_name' => 'Tipo de Ticket',
             'content' => 'tiposticket/form_modern'
@@ -40,6 +42,7 @@ class TiposTicket extends ResourceController
     {
         $data = [
             'nombre' => $this->request->getPost('nombre'),
+            'cliente_id' => $this->request->getPost('cliente_id') ?: null,
         ];
 
         if ($this->model->insert($data)) {
@@ -59,6 +62,7 @@ class TiposTicket extends ResourceController
 
         $data = [
             'title' => 'Editar Tipo de Ticket',
+            'clientes' => (new ClienteModel())->getClientes(),
             'item' => $item,
             'resource_name' => 'tiposticket',
             'singular_name' => 'Tipo de Ticket',
@@ -72,6 +76,7 @@ class TiposTicket extends ResourceController
     {
         $data = [
             'nombre' => $this->request->getPost('nombre'),
+            'cliente_id' => $this->request->getPost('cliente_id') ?: null,
         ];
 
         if ($this->model->update($id, $data)) {
