@@ -38,7 +38,7 @@
                     <?= strtoupper(substr($cliente_nombre, 0, 2)) ?>
                 </div>
                 <div>
-                    <p class="text-slate-500 dark:text-slate-400 text-[10px] uppercase font-semibold tracking-wider mb-0.5">Cliente</p>
+                    <p class="text-slate-500 dark:text-slate-400 text-[10px] uppercase font-semibold tracking-wider mb-0.5"><?= etiqueta('cliente') ?></p>
                     <p class="text-slate-900 dark:text-white text-sm font-bold"><?= $cliente_nombre ?></p>
                 </div>
             </div>

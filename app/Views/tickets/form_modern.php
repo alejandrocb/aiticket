@@ -16,10 +16,10 @@
     <form action="<?= isset($ticket) ? base_url('tickets/actualizar/' . $ticket['id']) : base_url('tickets/insertar') ?>" method="POST" enctype="multipart/form-data">
         <div class="flex flex-col gap-4">
             <div class="flex flex-col gap-2">
-                <label class="text-[#111418] dark:text-white text-base font-medium leading-normal">Cliente</label>
+                <label class="text-[#111418] dark:text-white text-base font-medium leading-normal"><?= etiqueta('cliente') ?></label>
                 <div class="relative">
                     <select class="w-full appearance-none rounded-lg border border-gray-300 dark:border-[#3b4754] bg-white dark:bg-[#1c2127] text-[#111418] dark:text-white h-14 px-4 pr-10 text-base font-normal focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors" name="cliente_id" required>
-                        <option disabled="" selected="" value="">Seleccionar Cliente</option>
+                        <option disabled="" selected="" value="">Seleccionar <?= etiqueta('cliente') ?></option>
                         <?php foreach ($clientes as $cliente): ?>
                             <option value="<?= $cliente['id'] ?>" data-responsable="<?= esc($cliente['responsable_defecto_id'] ?? '') ?>" <?= (isset($ticket) && $ticket['cliente_id'] == $cliente['id']) ? 'selected' : '' ?>><?= $cliente['nombre'] ?></option>
                         <?php endforeach; ?>

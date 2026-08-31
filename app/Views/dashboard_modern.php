@@ -2,7 +2,7 @@
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <!-- Top 5 Clientes -->
     <div class="bg-surface-light dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-[#e5e7eb] dark:border-transparent">
-        <h6 class="text-primary font-bold mb-4">Top 5 Clientes (Último Mes)</h6>
+        <h6 class="text-primary font-bold mb-4">Top 5 <?= etiqueta('clientes') ?> (Último Mes)</h6>
         <div class="relative h-64">
             <canvas id="ticketsLastMonthTop5Chart"></canvas>
         </div>

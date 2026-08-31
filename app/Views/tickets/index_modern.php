@@ -54,7 +54,7 @@
 
             <!-- Filtro por Cliente -->
             <div class="flex flex-col gap-2">
-                <label class="text-sm font-semibold text-[#111418] dark:text-white">Cliente</label>
+                <label class="text-sm font-semibold text-[#111418] dark:text-white"><?= etiqueta('cliente') ?></label>
                 <select 
                     name="cliente_id" 
                     id="filter-cliente" 

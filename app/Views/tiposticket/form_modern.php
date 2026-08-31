@@ -16,7 +16,7 @@
         </div>
 
         <div class="flex flex-col gap-2">
-            <label class="text-[#111418] dark:text-white text-base font-medium leading-normal">Cliente</label>
+            <label class="text-[#111418] dark:text-white text-base font-medium leading-normal"><?= etiqueta('cliente') ?></label>
             <div class="relative">
                 <select name="cliente_id" class="w-full appearance-none rounded-lg border border-gray-300 dark:border-[#3b4754] bg-white dark:bg-[#1c2127] text-[#111418] dark:text-white h-12 px-4 pr-10 text-base focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors">
                     <option value="">Global — disponible para todos</option>

@@ -54,8 +54,8 @@
                 <div class="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
                     <span class="material-symbols-outlined text-3xl text-gray-400">group_off</span>
                 </div>
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">No hay clientes</h3>
-                <p class="text-sm text-gray-500 dark:text-gray-400 max-w-[250px] mt-1">No se encontraron clientes registrados en el sistema.</p>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">No hay <?= strtolower(etiqueta('clientes')) ?></h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 max-w-[250px] mt-1">No se encontraron <?= strtolower(etiqueta('clientes')) ?> registrados en el sistema.</p>
             </div>
         <?php endif; ?>
     </div>

@@ -23,7 +23,7 @@ class Clientes extends Controller
     public function index()
     {
         $data = [
-            'title' => 'Lista de Clientes',
+            'title' => 'Lista de ' . etiqueta('clientes'),
             'clientes' => $this->clienteModel->getClientes(),
             'content' => 'clientes/index_modern'
         ];
@@ -38,7 +38,7 @@ class Clientes extends Controller
         $escenarios = $this->escenarioModel->getEscenariosPorUsuario(session()->get('id'));
 
         $data = [
-            'title' => 'Crear Cliente',
+            'title' => 'Crear ' . etiqueta('cliente'),
             'escenarios' => $escenarios,
             'usuarios' => $this->usuarioModel->findAll(),
             'content' => 'clientes/form_modern'
@@ -74,7 +74,7 @@ class Clientes extends Controller
     public function edit($id)
     {
         $data = [
-            'title' => 'Editar Cliente',
+            'title' => 'Editar ' . etiqueta('cliente'),
             'cliente' => $this->clienteModel->find($id),
             'usuarios' => $this->usuarioModel->findAll(),
             'content' => 'clientes/form_modern'

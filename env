@@ -26,6 +26,24 @@ app.baseURL = 'http://localhost:8080/'
 # app.forceGlobalSecureRequests = true   # exige HTTPS (recomendado en producción)
 
 #--------------------------------------------------------------------
+# ETIQUETAS  (cómo llama esta instalación a las cosas)
+#--------------------------------------------------------------------
+#
+# Las dos instalaciones salen del mismo código, así que lo que cambia de
+# vocabulario va aquí y no escrito en las vistas. Si se dejan sin poner,
+# se usan los valores de app/Config/Etiquetas.php: Soporte / Cliente /
+# Clientes, que es como se ha visto siempre.
+#
+# En el Puesto de Mando, por ejemplo:
+#   etiquetas.app      = 'Puesto de Mando'
+#   etiquetas.cliente  = 'Grupo actuante'
+#   etiquetas.clientes = 'Grupos actuantes'
+
+# etiquetas.app =
+# etiquetas.cliente =
+# etiquetas.clientes =
+
+#--------------------------------------------------------------------
 # BASE DE DATOS
 #--------------------------------------------------------------------
 
