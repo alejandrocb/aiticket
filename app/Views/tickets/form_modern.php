@@ -36,7 +36,7 @@
                     <select class="w-full appearance-none rounded-lg border border-gray-300 dark:border-[#3b4754] bg-white dark:bg-[#1c2127] text-[#111418] dark:text-white h-14 px-4 pr-10 text-base font-normal focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors" name="responsable_id">
                         <option value="">Asignar a...</option>
                         <?php foreach ($usuarios as $usuario): ?>
-                             <?php if (in_array($usuario['tipo_usuario_id'], [1, 2])): // Admin or Support ?>
+                             <?php if ($usuario['tipo_usuario_id'] != 3): // Todos menos los usuarios de tipo cliente ?>
                                 <option value="<?= $usuario['id'] ?>" <?= (isset($ticket) && $ticket['responsable_id'] == $usuario['id']) ? 'selected' : '' ?>><?= $usuario['nombre'] ?></option>
                              <?php endif; ?>
                         <?php endforeach; ?>

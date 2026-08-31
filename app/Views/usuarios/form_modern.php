@@ -17,7 +17,7 @@
 
         <div class="flex flex-col gap-2">
             <label class="text-[#111418] dark:text-white text-base font-medium leading-normal">Email</label>
-            <input type="email" name="email" value="<?= isset($usuario) ? esc($usuario['email']) : '' ?>" class="form-input w-full rounded-lg border border-gray-300 dark:border-[#3b4754] bg-white dark:bg-[#1c2127] h-12 px-4 text-base focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors" required>
+            <input type="text" name="email" value="<?= isset($usuario) ? esc($usuario['email']) : '' ?>" class="form-input w-full rounded-lg border border-gray-300 dark:border-[#3b4754] bg-white dark:bg-[#1c2127] h-12 px-4 text-base focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors" required>
         </div>
 
         <div class="flex flex-col gap-2">
