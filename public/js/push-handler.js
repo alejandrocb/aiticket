@@ -66,13 +66,32 @@ window.PushHandler = (function () {
     }
 
     function init(clavePublicaVapid, baseUrl) {
-        if (!clavePublicaVapid) {
-            log('No hay clave VAPID configurada. Revisa VAPID_PUBLIC_KEY en el .env.');
+        if (!('serviceWorker' in navigator)) {
+            log('El navegador no admite service workers, o la página no se sirve por https.');
             return;
         }
 
-        if (!('serviceWorker' in navigator)) {
-            log('El navegador no admite service workers, o la página no se sirve por https.');
+        // El registro va SIEMPRE, tenga o no claves VAPID. Chrome exige un
+        // service worker registrado para ofrecer instalar la aplicación; si
+        // esto dependiera del push, sin claves configuradas la PWA dejaria de
+        // ser instalable y solo se podria anadir un acceso directo.
+        var registro = navigator.serviceWorker.register(baseUrl + RUTA_SW)
+            .then(function (reg) {
+                log('Service worker registrado.');
+                // Si ya está activo se resuelve de inmediato; si acaba de
+                // instalarse, espera a que lo esté antes de suscribir.
+                return navigator.serviceWorker.ready.then(function () {
+                    return reg;
+                });
+            });
+
+        registro.catch(function (error) {
+            log('No se pudo registrar el service worker: ' + error.message);
+        });
+
+        // A partir de aquí, solo lo relativo al push.
+        if (!clavePublicaVapid) {
+            log('Sin clave VAPID: la aplicación es instalable, pero no habrá avisos push.');
             return;
         }
 
@@ -81,15 +100,7 @@ window.PushHandler = (function () {
             return;
         }
 
-        navigator.serviceWorker.register(baseUrl + RUTA_SW)
-            .then(function (registro) {
-                log('Service worker registrado.');
-                // Si ya está activo se resuelve de inmediato; si acaba de
-                // instalarse, espera a que lo esté antes de suscribir.
-                return navigator.serviceWorker.ready.then(function () {
-                    return registro;
-                });
-            })
+        registro
             .then(function (registro) {
                 return Notification.requestPermission().then(function (permiso) {
                     if (permiso !== 'granted') {

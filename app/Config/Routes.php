@@ -11,6 +11,10 @@ $routes->get('login', 'AuthController::loginForm');
 $routes->post('login', 'AuthController::login');
 $routes->get('logout', 'AuthController::logout');
 
+// Manifiesto de la PWA: fuera del filtro de autenticacion, porque el navegador
+// lo pide sin cookies de sesion para decidir si la aplicacion es instalable.
+$routes->get('manifest.json', 'Manifest::index');
+
 // Rutas que requieren autenticación
 $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->post('push/subscribe', 'PushController::subscribe');

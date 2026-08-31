@@ -53,6 +53,15 @@ class Etiquetas extends BaseConfig
     public string $logoOscuro = '';
 
     /**
+     * Color de acento de la instalación, en hexadecimal.
+     *
+     * Lo usan la barra del navegador en móvil y el manifiesto de la PWA. Es
+     * solo el color del sistema operativo: la paleta de la interfaz se define
+     * en public/css/src/tailwind-input.css y hay que recompilar para cambiarla.
+     */
+    public string $colorTema = '#137fec';
+
+    /**
      * Quien reporta la incidencia, en singular. Se usa en etiquetas de
      * formulario y en cabeceras de tabla.
      */

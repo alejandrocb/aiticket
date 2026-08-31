@@ -15,12 +15,12 @@
     <title><?= $title ?? 'Panel de Tickets'; ?></title>
     
     <!-- PWA Meta Tags -->
-    <link rel="manifest" href="<?= base_url('manifest.json?v=' . time()) ?>">
-    <meta name="theme-color" content="#137fec">
+    <link rel="manifest" href="<?= base_url('manifest.json') ?>">
+    <meta name="theme-color" content="<?= esc(etiqueta('colorTema'), 'attr') ?>">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Aiticket">
+    <meta name="apple-mobile-web-app-title" content="<?= esc(etiqueta('app'), 'attr') ?>">
     <link rel="apple-touch-icon" href="<?= base_url('images/icon-192.png') ?>">
     
     <link href="https://fonts.googleapis.com" rel="preconnect"/>
