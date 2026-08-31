@@ -145,13 +145,20 @@ $tiempoMedio = $minutos === null
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 print:grid-cols-2">
         <div class="rounded-xl border border-[#e5e7eb] dark:border-transparent bg-surface-light dark:bg-surface-dark p-4 print:border-black">
             <h3 class="text-sm font-bold text-[#111418] dark:text-white mb-3 print:text-black">Reparto por <?= esc(strtolower(etiqueta('cliente'))) ?></h3>
-            <canvas id="grafica-grupos" height="220"></canvas>
+            <!-- Altura fija y position:relative. Chart.js redimensiona el
+                 lienzo al tamaño del contenedor; si este no tiene altura
+                 propia, crecen el uno al otro indefinidamente. -->
+            <div class="relative h-72">
+                <canvas id="grafica-grupos"></canvas>
+            </div>
         </div>
         <div class="rounded-xl border border-[#e5e7eb] dark:border-transparent bg-surface-light dark:bg-surface-dark p-4 print:border-black">
             <h3 class="text-sm font-bold text-[#111418] dark:text-white mb-3 print:text-black">
                 Evolución por <?= $evolucion['agrupacion'] === 'hora' ? 'hora' : 'día' ?>
             </h3>
-            <canvas id="grafica-evolucion" height="220"></canvas>
+            <div class="relative h-72">
+                <canvas id="grafica-evolucion"></canvas>
+            </div>
         </div>
     </div>
 
@@ -201,6 +208,7 @@ $tiempoMedio = $minutos === null
             indexAxis: 'y',
             plugins: { legend: { display: false } },
             scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
+            responsive: true,
             maintainAspectRatio: false,
             animation: false
         }
@@ -215,6 +223,7 @@ $tiempoMedio = $minutos === null
         options: {
             plugins: { legend: { display: false } },
             scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+            responsive: true,
             maintainAspectRatio: false,
             animation: false
         }
