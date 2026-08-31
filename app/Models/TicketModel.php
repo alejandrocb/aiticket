@@ -6,6 +6,21 @@ use CodeIgniter\Model;
 
 class TicketModel extends Model
 {
+    /**
+     * Estado que da una incidencia por cerrada.
+     *
+     * El identificador va escrito por todo el código desde antes; aquí queda
+     * al menos nombrado y en un solo sitio para lo que se escriba a partir
+     * de ahora.
+     */
+    public const ESTADO_CERRADO = 3;
+
+    /**
+     * Estados que no cuentan como abiertos: el de cerrado y el 11, que el
+     * resto del código viene excluyendo junto a él de los listados.
+     */
+    public const ESTADOS_NO_ABIERTOS = [3, 11];
+
     protected $table = 'tickets';
     protected $primaryKey = 'id';
 
@@ -250,6 +265,158 @@ class TicketModel extends Model
         return implode('.', [
             $t['max_id'], $t['total'], $t['suma_estados'], $t['suma_responsables'], $m['max_mov'],
         ]);
+    }
+
+    // ------------------------------------------------------------------
+    //  Informes
+    // ------------------------------------------------------------------
+
+    /**
+     * Prepara un constructor de consultas sobre `tickets` ya acotado al
+     * escenario activo y al rango de fechas del informe.
+     *
+     * Devuelve null si el usuario no tiene ningún escenario activo, en cuyo
+     * caso no hay nada que contar y quien llama debe devolver vacío.
+     */
+    private function baseInforme(?string $desde, ?string $hasta)
+    {
+        $escenariosActivos = $this->getEscenariosActivos();
+
+        if (empty($escenariosActivos)) {
+            return null;
+        }
+
+        $builder = \Config\Database::connect()->table('tickets t')
+                                              ->whereIn('t.escenario_id', $escenariosActivos);
+
+        if ($desde) {
+            $builder->where('t.fecha_creacion >=', $desde . ' 00:00:00');
+        }
+
+        if ($hasta) {
+            $builder->where('t.fecha_creacion <=', $hasta . ' 23:59:59');
+        }
+
+        return $builder;
+    }
+
+    /**
+     * Cifras de cabecera del informe.
+     *
+     * El tiempo medio de cierre es aproximado: no existe columna con la fecha
+     * de cierre, así que se toma la del último movimiento de la incidencia
+     * como momento en que se cerró. Es el mismo criterio que ya usa el listado
+     * de cerradas. Si una incidencia se cierra y después recibe un comentario,
+     * su tiempo sale algo inflado.
+     */
+    public function resumenGeneral(?string $desde = null, ?string $hasta = null): array
+    {
+        $vacio = ['total' => 0, 'abiertas' => 0, 'cerradas' => 0, 'minutos_medios' => null];
+
+        if (! $builder = $this->baseInforme($desde, $hasta)) {
+            return $vacio;
+        }
+
+        $noAbiertos = implode(',', self::ESTADOS_NO_ABIERTOS);
+
+        $fila = $builder->select(
+            'COUNT(t.id) AS total,
+             SUM(CASE WHEN t.estado_ticket_id NOT IN (' . $noAbiertos . ') THEN 1 ELSE 0 END) AS abiertas,
+             SUM(CASE WHEN t.estado_ticket_id = ' . self::ESTADO_CERRADO . ' THEN 1 ELSE 0 END) AS cerradas,
+             AVG(CASE WHEN t.estado_ticket_id = ' . self::ESTADO_CERRADO . '
+                      THEN TIMESTAMPDIFF(MINUTE, t.fecha_creacion,
+                           COALESCE((SELECT MAX(m.fecha_movimiento) FROM ticket_movimientos m
+                                     WHERE m.ticket_id = t.id), t.fecha_creacion))
+                 END) AS minutos_medios',
+            false
+        )->get()->getRowArray();
+
+        return [
+            'total'          => (int) ($fila['total'] ?? 0),
+            'abiertas'       => (int) ($fila['abiertas'] ?? 0),
+            'cerradas'       => (int) ($fila['cerradas'] ?? 0),
+            'minutos_medios' => $fila['minutos_medios'] !== null ? (int) round($fila['minutos_medios']) : null,
+        ];
+    }
+
+    /** Incidencias por grupo de acción, con su reparto entre abiertas y cerradas. */
+    public function resumenPorGrupo(?string $desde = null, ?string $hasta = null): array
+    {
+        if (! $builder = $this->baseInforme($desde, $hasta)) {
+            return [];
+        }
+
+        $noAbiertos = implode(',', self::ESTADOS_NO_ABIERTOS);
+
+        return $builder->select(
+            'c.id AS cliente_id, c.nombre AS grupo,
+             COUNT(t.id) AS total,
+             SUM(CASE WHEN t.estado_ticket_id NOT IN (' . $noAbiertos . ') THEN 1 ELSE 0 END) AS abiertas,
+             SUM(CASE WHEN t.estado_ticket_id = ' . self::ESTADO_CERRADO . ' THEN 1 ELSE 0 END) AS cerradas',
+            false
+        )->join('clientes c', 'c.id = t.cliente_id')
+         ->groupBy('c.id, c.nombre')
+         ->orderBy('total', 'DESC')
+         ->get()->getResultArray();
+    }
+
+    /**
+     * Desglose por tipología dentro de cada grupo: el nivel de detalle que
+     * responde a "qué ha pasado" y no solo a "cuántas".
+     */
+    public function resumenPorTipologia(?string $desde = null, ?string $hasta = null): array
+    {
+        if (! $builder = $this->baseInforme($desde, $hasta)) {
+            return [];
+        }
+
+        $noAbiertos = implode(',', self::ESTADOS_NO_ABIERTOS);
+
+        return $builder->select(
+            'c.id AS cliente_id, c.nombre AS grupo, tt.nombre AS tipologia,
+             COUNT(t.id) AS total,
+             SUM(CASE WHEN t.estado_ticket_id NOT IN (' . $noAbiertos . ') THEN 1 ELSE 0 END) AS abiertas,
+             SUM(CASE WHEN t.estado_ticket_id = ' . self::ESTADO_CERRADO . ' THEN 1 ELSE 0 END) AS cerradas',
+            false
+        )->join('clientes c', 'c.id = t.cliente_id')
+         ->join('tipos_ticket tt', 'tt.id = t.tipo_ticket_id', 'left')
+         ->groupBy('c.id, c.nombre, tt.nombre')
+         ->orderBy('c.nombre', 'ASC')
+         ->orderBy('total', 'DESC')
+         ->get()->getResultArray();
+    }
+
+    /**
+     * Evolución del dispositivo a lo largo del tiempo.
+     *
+     * Para un rango corto —un dispositivo dura dos o tres días— agrupar por
+     * día daría tres barras y no diría nada; se agrupa por hora, que es donde
+     * se ve la punta de trabajo. Para rangos largos, por día.
+     */
+    public function evolucion(?string $desde = null, ?string $hasta = null): array
+    {
+        if (! $builder = $this->baseInforme($desde, $hasta)) {
+            return ['agrupacion' => 'hora', 'filas' => []];
+        }
+
+        $porHoras = true;
+
+        if ($desde && $hasta) {
+            $dias = (strtotime($hasta) - strtotime($desde)) / 86400;
+            $porHoras = $dias <= 3;
+        } elseif (! $desde && ! $hasta) {
+            // Sin rango no sabemos cuánto abarca: por día es lo prudente.
+            $porHoras = false;
+        }
+
+        $formato = $porHoras ? '%Y-%m-%d %H:00' : '%Y-%m-%d';
+
+        $filas = $builder->select("DATE_FORMAT(t.fecha_creacion, '{$formato}') AS momento, COUNT(t.id) AS total", false)
+                         ->groupBy('momento')
+                         ->orderBy('momento', 'ASC')
+                         ->get()->getResultArray();
+
+        return ['agrupacion' => $porHoras ? 'hora' : 'dia', 'filas' => $filas];
     }
 
     public function getTicketsCount($status = 'abiertos')

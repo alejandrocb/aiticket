@@ -75,7 +75,7 @@
                 <span class="text-sm font-medium">Prioridades</span>
             </a>
             
-            <a href="#" class="flex items-center gap-3 w-full px-3 py-2 text-text-secondary hover:text-[#111418] dark:hover:text-white hover:bg-gray-100 dark:hover:bg-[#2c3b4a] rounded-xl transition-colors">
+            <a href="<?= base_url('reportes') ?>" class="flex items-center gap-3 w-full px-3 py-2 <?= (strpos(uri_string(), 'reportes') !== false) ? 'bg-primary/10 text-primary' : 'text-text-secondary hover:text-[#111418] dark:hover:text-white hover:bg-gray-100 dark:hover:bg-[#2c3b4a]' ?> rounded-xl transition-colors">
                 <span class="material-symbols-outlined">bar_chart</span>
                 <span class="text-sm font-medium">Reportes</span>
             </a>
@@ -153,10 +153,10 @@
                     <span class="material-symbols-outlined <?= (strpos(uri_string(), 'tickets') !== false) ? 'text-primary' : 'text-text-secondary group-hover:text-primary' ?> transition-colors">confirmation_number</span>
                     <span class="text-[10px] font-medium <?= (strpos(uri_string(), 'tickets') !== false) ? 'text-primary' : 'text-text-secondary group-hover:text-primary' ?>">Tickets</span>
                 </a>
-                <button class="flex flex-col items-center justify-center w-full h-full gap-1 group">
-                    <span class="material-symbols-outlined text-text-secondary group-hover:text-primary transition-colors">bar_chart</span>
-                    <span class="text-[10px] font-medium text-text-secondary group-hover:text-primary">Reportes</span>
-                </button>
+                <a href="<?= base_url('reportes') ?>" class="flex flex-col items-center justify-center w-full h-full gap-1 group">
+                    <span class="material-symbols-outlined <?= (strpos(uri_string(), 'reportes') !== false) ? 'text-primary' : 'text-text-secondary group-hover:text-primary' ?> transition-colors">bar_chart</span>
+                    <span class="text-[10px] font-medium <?= (strpos(uri_string(), 'reportes') !== false) ? 'text-primary' : 'text-text-secondary group-hover:text-primary' ?>">Reportes</span>
+                </a>
             </div>
         </div>
     </div>

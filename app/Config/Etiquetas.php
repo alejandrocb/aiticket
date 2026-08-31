@@ -33,6 +33,15 @@ class Etiquetas extends BaseConfig
     public string $app = 'Soporte';
 
     /**
+     * Ruta del logotipo dentro de public/, por ejemplo 'images/logo.png'.
+     *
+     * Vacío significa que no hay logotipo y se muestra el nombre en texto, que
+     * es como se ha visto siempre. En cuanto se deje el fichero y se apunte
+     * aquí, aparece en la cabecera de los informes sin tocar código.
+     */
+    public string $logo = '';
+
+    /**
      * Quien reporta la incidencia, en singular. Se usa en etiquetas de
      * formulario y en cabeceras de tabla.
      */

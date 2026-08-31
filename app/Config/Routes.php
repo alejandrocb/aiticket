@@ -65,6 +65,9 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->get('notifications/markRead/(:num)', 'Notifications::markRead/$1');
     $routes->get('notifications/markAllRead', 'Notifications::markAllRead');
     
+    // Informes
+    $routes->get('reportes', 'Reportes::index');
+
     // Ruta de Perfil
     $routes->get('profile', 'Profile::index');
     $routes->post('profile/update', 'Profile::update');
