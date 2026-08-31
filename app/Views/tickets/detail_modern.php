@@ -110,6 +110,10 @@
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-slate-900 dark:text-white text-base font-bold">Movimientos Recientes</h3>
             <a href="<?= base_url('tickets/history/'.$ticket['id']) ?>" class="text-primary text-xs font-semibold">Ver Historial Completo</a>
+            <a href="<?= base_url('tickets/informe/'.$ticket['id']) ?>" class="text-primary text-xs font-semibold inline-flex items-center gap-1 ml-3">
+                <span class="material-symbols-outlined text-[14px]">print</span>
+                Informe para imprimir
+            </a>
         </div>
         
         <div class="relative pl-2">

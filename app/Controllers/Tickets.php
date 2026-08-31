@@ -578,6 +578,33 @@ class Tickets extends Controller
         echo view('templates/layout_modern', $data);
     }
 
+    /**
+     * Informe imprimible de una incidencia, con su historial completo.
+     *
+     * Los movimientos van del más antiguo al más reciente, al revés que en la
+     * pantalla de detalle: en un documento se lee el relato en el orden en que
+     * ocurrió, no empezando por el final.
+     */
+    public function informe($id)
+    {
+        $ticket = $this->ticketModel->informeDeIncidencia($id);
+
+        if (! $ticket) {
+            return redirect()->to('/tickets')->with('errors', 'Incidencia no encontrada.');
+        }
+
+        $movimientos = array_reverse($this->ticketMovimientoModel->getMovimientosWithDetails($id));
+
+        $data = [
+            'title'       => 'Informe de la incidencia #' . $id,
+            'ticket'      => $ticket,
+            'movimientos' => $movimientos,
+            'content'     => 'tickets/informe',
+        ];
+
+        return view('templates/layout_modern', $data);
+    }
+
     public function crearMovimiento($ticketId, $descripcion, $tipoTicketId)
     {
         $data = [

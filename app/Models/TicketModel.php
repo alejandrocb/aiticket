@@ -301,6 +301,47 @@ class TicketModel extends Model
     }
 
     /**
+     * Una incidencia con todos sus datos legibles, para el informe individual.
+     *
+     * A diferencia de `find()`, esta consulta **sí** filtra por escenario
+     * activo: el informe se abre por su identificador en la URL y sin este
+     * filtro cualquier usuario podría leer incidencias de otro dispositivo
+     * cambiando el número a mano.
+     *
+     * Devuelve null si la incidencia no existe o no pertenece a un escenario
+     * activo del usuario.
+     */
+    public function informeDeIncidencia($id): ?array
+    {
+        $escenariosActivos = $this->getEscenariosActivos();
+
+        if (empty($escenariosActivos)) {
+            return null;
+        }
+
+        $fila = $this->select('tickets.*,
+                               clientes.nombre AS cliente_nombre,
+                               estados_ticket.nombre AS estado_nombre,
+                               tipos_ticket.nombre AS tipo_ticket_nombre,
+                               prioridades_ticket.nombre AS prioridad_nombre,
+                               responsable.nombre AS responsable_nombre,
+                               creador.nombre AS creador_nombre,
+                               escenarios.nombre AS escenario_nombre')
+                    ->join('clientes', 'clientes.id = tickets.cliente_id', 'left')
+                    ->join('estados_ticket', 'estados_ticket.id = tickets.estado_ticket_id', 'left')
+                    ->join('tipos_ticket', 'tipos_ticket.id = tickets.tipo_ticket_id', 'left')
+                    ->join('prioridades_ticket', 'prioridades_ticket.id = tickets.prioridad_ticket_id', 'left')
+                    ->join('usuarios responsable', 'responsable.id = tickets.responsable_id', 'left')
+                    ->join('usuarios creador', 'creador.id = tickets.usuario_id', 'left')
+                    ->join('escenarios', 'escenarios.id = tickets.escenario_id', 'left')
+                    ->where('tickets.id', $id)
+                    ->whereIn('tickets.escenario_id', $escenariosActivos)
+                    ->first();
+
+        return $fila ?: null;
+    }
+
+    /**
      * Cifras de cabecera del informe.
      *
      * El tiempo medio de cierre es aproximado: no existe columna con la fecha

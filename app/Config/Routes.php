@@ -49,6 +49,7 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->get('tickets/eliminar/(:num)', 'Tickets::delete/$1');
     $routes->get('tickets/detail/(:num)', 'Tickets::detail/$1');
     $routes->get('tickets/history/(:num)', 'Tickets::history/$1');
+    $routes->get('tickets/informe/(:num)', 'Tickets::informe/$1');
     $routes->get('tickets/cerrar/(:num)', 'Tickets::close/$1');
 
     // Rutas personalizadas para Tickets Recurrentes
