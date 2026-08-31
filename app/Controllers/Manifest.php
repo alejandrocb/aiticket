@@ -28,7 +28,10 @@ class Manifest extends Controller
             // navegador la considera otra aplicación distinta.
             'id'               => base_url('/'),
             'name'             => $nombre,
-            'short_name'       => mb_substr($nombre, 0, 12),
+            // Sin nombre corto configurado se manda el completo y que lo
+            // abrevie el sistema: cortarlo aquí produce cosas como
+            // "Puesto de Ma" debajo del icono.
+            'short_name'       => etiqueta('appCorto') ?: $nombre,
             'description'      => 'Gestión de incidencias y avisos en tiempo real.',
             'start_url'        => base_url('dashboard'),
             'scope'            => base_url('/'),

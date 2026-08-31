@@ -53,6 +53,18 @@ class Etiquetas extends BaseConfig
     public string $logoOscuro = '';
 
     /**
+     * Nombre corto para debajo del icono en la pantalla de inicio.
+     *
+     * Android muestra ahí muy poco texto. Si se deja vacío se usa el nombre
+     * completo y es el sistema quien lo abrevia con puntos suspensivos, que
+     * queda mejor que cortarlo por donde caiga: 'Puesto de Mando' recortado a
+     * doce caracteres se convierte en 'Puesto de Ma'.
+     *
+     * Conviene que no pase de unos 12 caracteres. Por ejemplo: 'PMA'.
+     */
+    public string $appCorto = '';
+
+    /**
      * Icono cuadrado de la aplicación instalada, dentro de public/.
      *
      * Debe ser PNG de 512x512, opaco y a sangre —sin esquinas redondeadas
