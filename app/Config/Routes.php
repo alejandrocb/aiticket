@@ -35,6 +35,7 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
 
     // Rutas personalizadas para Tickets
     $routes->get('tickets', 'Tickets::index');
+    $routes->get('tickets/cambios', 'Tickets::cambios');
     $routes->get('tickets/cerrados', 'Tickets::closed');
     $routes->get('tickets/programados', 'Tickets::scheduled');
     $routes->get('tickets/crear', 'Tickets::create');

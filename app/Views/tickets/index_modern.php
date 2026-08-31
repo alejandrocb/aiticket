@@ -538,3 +538,95 @@ document.addEventListener('DOMContentLoaded', function() {
         <span class="material-symbols-outlined text-4xl">chevron_right</span>
     </button>
 </div>
+
+<!-- Aviso de novedades -->
+<div id="aviso-novedades" class="hidden fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-[120] flex items-center gap-3 rounded-full bg-primary text-white pl-5 pr-2 py-2 shadow-lg shadow-primary/30">
+    <span class="material-symbols-outlined text-[20px]">sync</span>
+    <span class="text-sm font-medium">Hay novedades</span>
+    <button type="button" id="btn-actualizar-ahora" class="rounded-full bg-white/20 hover:bg-white/30 transition-colors px-3 py-1 text-sm font-semibold">
+        Actualizar
+    </button>
+</div>
+
+<script>
+/**
+ * El panel se queda abierto durante todo el dispositivo, así que se mantiene
+ * al día solo. Cada pocos segundos pregunta al servidor por la huella del
+ * listado y, si ha cambiado, recarga.
+ *
+ * Se recarga la página entera en lugar de sustituir las tarjetas porque este
+ * listado tiene bastante estado en el navegador —búsqueda, filtros, orden— y
+ * cambiar el HTML por debajo lo dejaría descolocado. Como solo ocurre cuando
+ * de verdad ha pasado algo, y no cada X minutos a ciegas, apenas se nota.
+ *
+ * No se recarga mientras se está escribiendo o con un desplegable abierto: en
+ * ese caso aparece un aviso y decide la persona.
+ */
+(function () {
+    'use strict';
+
+    var INTERVALO_MS = 10000;
+    var firmaActual = <?= json_encode($firmaCambios ?? '') ?>;
+    var aviso = document.getElementById('aviso-novedades');
+    var botonActualizar = document.getElementById('btn-actualizar-ahora');
+    var pendiente = false;
+
+    if (!firmaActual) return;
+
+    botonActualizar.addEventListener('click', function () {
+        window.location.reload();
+    });
+
+    /** ¿Está la persona a media faena? Entonces no le movemos la página. */
+    function estaOcupado() {
+        var activo = document.activeElement;
+
+        if (activo && /^(INPUT|TEXTAREA|SELECT)$/.test(activo.tagName)) {
+            return true;
+        }
+
+        var panelFiltros = document.getElementById('filters-panel');
+        if (panelFiltros && !panelFiltros.classList.contains('hidden')) {
+            return true;
+        }
+
+        // El visor de imágenes a pantalla completa también cuenta.
+        var galeria = document.getElementById('gallery-modal');
+        return !!(galeria && !galeria.classList.contains('hidden'));
+    }
+
+    function actualizarSiSePuede() {
+        if (estaOcupado()) {
+            aviso.classList.remove('hidden');
+            pendiente = true;
+            return;
+        }
+        window.location.reload();
+    }
+
+    function comprobar() {
+        // Con la pestaña en segundo plano no gastamos peticiones: al volver a
+        // ella se comprueba de inmediato.
+        if (document.hidden) return;
+
+        fetch('<?= base_url('tickets/cambios') ?>', { credentials: 'same-origin' })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (datos) {
+                if (!datos || !datos.firma || datos.firma === firmaActual) return;
+                actualizarSiSePuede();
+            })
+            .catch(function () {
+                // Un corte de red puntual no debe llenar la consola: al
+                // siguiente intento se vuelve a probar.
+            });
+    }
+
+    document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) {
+            pendiente ? actualizarSiSePuede() : comprobar();
+        }
+    });
+
+    setInterval(comprobar, INTERVALO_MS);
+})();
+</script>

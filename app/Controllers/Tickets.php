@@ -98,10 +98,23 @@ class Tickets extends Controller
             'clientes' => $clientes,
             'usuarios' => $usuarios,
             'filters' => $filters,
+            // Huella con la que se pinta esta página. El navegador la compara
+            // contra /tickets/cambios para saber si hay novedades.
+            'firmaCambios' => $this->ticketModel->firmaDeCambios(),
             'content' => 'tickets/index_modern'
         ];
 
         return view('templates/layout_modern', $data);
+    }
+
+    /**
+     * Huella del listado, que el panel sondea para saber si tiene que
+     * recargarse. Devuelve unos pocos bytes: la comparación la hace el
+     * navegador contra la huella con la que se pintó la página.
+     */
+    public function cambios()
+    {
+        return $this->response->setJSON(['firma' => $this->ticketModel->firmaDeCambios()]);
     }
 
     /**

@@ -208,6 +208,50 @@ class TicketModel extends Model
             ->findAll();
     }
 
+    /**
+     * Huella del estado actual del listado, para detectar cambios sin traerse
+     * los datos.
+     *
+     * El panel del Puesto de Mando se queda abierto durante todo el
+     * dispositivo, así que sondea esta huella cada pocos segundos y solo se
+     * recarga cuando cambia de verdad. Son dos consultas de agregados sobre
+     * las incidencias del escenario activo: con las decenas de filas que
+     * maneja un dispositivo, el coste es despreciable.
+     *
+     * Recoge altas y bajas (máximo id y total), movimientos nuevos (máximo id
+     * de movimiento) y cambios de estado o de responsable (las sumas). Las
+     * sumas podrían en teoría no variar si dos cambios se compensasen
+     * exactamente entre sí; con este volumen no es un riesgo real, y el
+     * siguiente movimiento lo delataría igualmente.
+     */
+    public function firmaDeCambios(): string
+    {
+        $escenariosActivos = $this->getEscenariosActivos();
+
+        if (empty($escenariosActivos)) {
+            return 'sin-escenario';
+        }
+
+        $db = \Config\Database::connect();
+
+        $t = $db->table('tickets')
+                ->select('COALESCE(MAX(id), 0) AS max_id, COUNT(id) AS total,
+                          COALESCE(SUM(estado_ticket_id), 0) AS suma_estados,
+                          COALESCE(SUM(responsable_id), 0) AS suma_responsables', false)
+                ->whereIn('escenario_id', $escenariosActivos)
+                ->get()->getRowArray();
+
+        $m = $db->table('ticket_movimientos tm')
+                ->select('COALESCE(MAX(tm.id), 0) AS max_mov', false)
+                ->join('tickets t', 't.id = tm.ticket_id')
+                ->whereIn('t.escenario_id', $escenariosActivos)
+                ->get()->getRowArray();
+
+        return implode('.', [
+            $t['max_id'], $t['total'], $t['suma_estados'], $t['suma_responsables'], $m['max_mov'],
+        ]);
+    }
+
     public function getTicketsCount($status = 'abiertos')
     {
         $escenariosActivos = $this->getEscenariosActivos();
