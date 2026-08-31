@@ -68,7 +68,17 @@ if (! function_exists('marca')) {
             return '<img src="' . base_url($claro) . '" class="' . $clasesImg . '"' . $alt . '>';
         }
 
-        $oscuro = etiqueta('logoOscuro') ?: $claro;
+        $oscuro = etiqueta('logoOscuro');
+
+        // Sin variante oscura configurada se reutiliza la clara y se pasa a
+        // blanco por CSS: brightness(0) la vuelve negra conservando la
+        // transparencia, e invert(1) la deja en blanco. Pierde el color de
+        // marca, pero un logotipo de trazo negro sobre fondo oscuro sería
+        // sencillamente invisible. En cuanto se configure logoOscuro, manda
+        // el fichero y no se toca nada.
+        if ($oscuro === '') {
+            return '<img src="' . base_url($claro) . '" class="' . $clasesImg . ' dark:brightness-0 dark:invert"' . $alt . '>';
+        }
 
         return '<img src="' . base_url($claro) . '" class="' . $clasesImg . ' dark:hidden"' . $alt . '>'
              . '<img src="' . base_url($oscuro) . '" class="' . $clasesImg . ' hidden dark:block"' . $alt . '>';

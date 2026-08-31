@@ -53,6 +53,27 @@ class Etiquetas extends BaseConfig
     public string $logoOscuro = '';
 
     /**
+     * Icono cuadrado de la aplicación instalada, dentro de public/.
+     *
+     * Debe ser PNG de 512x512, opaco y a sangre —sin esquinas redondeadas
+     * propias— porque Android le aplica su propia máscara. Y todo lo
+     * importante dentro del 80% central, o el recorte circular se lo come.
+     *
+     * Vacío significa que el manifiesto no declara iconos y el navegador no
+     * podrá ofrecer instalar la aplicación, solo un acceso directo.
+     */
+    public string $icono = '';
+
+    /**
+     * Pictograma del aviso push, dentro de public/.
+     *
+     * PNG de 96x96, forma blanca sobre fondo transparente. Android lo pinta
+     * como silueta en la barra de estado: descarta el color y solo usa la
+     * transparencia, así que un fondo blanco se vería como un cuadrado.
+     */
+    public string $badge = '';
+
+    /**
      * Color de acento de la instalación, en hexadecimal.
      *
      * Lo usan la barra del navegador en móvil y el manifiesto de la PWA. Es

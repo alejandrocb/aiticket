@@ -123,6 +123,11 @@ class NotificationModel extends Model
                 'url'   => $link,
                 'userPhoto' => $userPhotoUrl,
                 'image' => $image ? base_url('upload/tickets/' . $image) : null,
+                // El pictograma de la barra de estado viaja en el aviso porque
+                // el service worker es un fichero estático y no puede leer la
+                // configuración de la instalación.
+                'badge' => etiqueta('badge') ? base_url(etiqueta('badge')) : null,
+                'icono' => etiqueta('icono') ? base_url(etiqueta('icono')) : null,
                 'tag'   => 'ticket-' . uniqid()
             ]);
 

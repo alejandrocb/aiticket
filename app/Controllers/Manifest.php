@@ -35,33 +35,40 @@ class Manifest extends Controller
             'display'          => 'standalone',
             'background_color' => '#ffffff',
             'theme_color'      => etiqueta('colorTema'),
-            'icons'            => [
-                [
-                    'src'     => base_url('images/icon-192.png'),
-                    'sizes'   => '192x192',
-                    'type'    => 'image/png',
-                    'purpose' => 'any',
-                ],
-                [
-                    'src'     => base_url('images/icon-512.png'),
-                    'sizes'   => '512x512',
-                    'type'    => 'image/png',
-                    'purpose' => 'any',
-                ],
-                // Maskable aparte y no combinado con 'any': Android recorta el
-                // maskable a un círculo, y un icono pensado para verse entero
-                // pierde los bordes si se declara para las dos cosas.
-                [
-                    'src'     => base_url('images/icon-512.png'),
-                    'sizes'   => '512x512',
-                    'type'    => 'image/png',
-                    'purpose' => 'maskable',
-                ],
-            ],
+            'icons'            => $this->iconos(),
         ];
 
         return $this->response
                     ->setContentType('application/manifest+json')
                     ->setBody(json_encode($manifiesto, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    /**
+     * Un único fichero de 512 declarado dos veces, para 'any' y para
+     * 'maskable', en lugar de uno por tamaño.
+     *
+     * Chrome necesita al menos un icono de 192 o más y recomienda 512 para la
+     * pantalla de arranque; con uno de 512 se cumplen las dos cosas y el
+     * navegador lo reescala solo. Se declaran por separado y no como
+     * "any maskable" porque Android recorta el maskable a un círculo, y un
+     * icono declarado para ambos usos pierde los bordes en el recorte.
+     *
+     * Sin icono configurado se devuelve una lista vacía: el manifiesto sigue
+     * siendo válido, pero el navegador no ofrecerá instalar la aplicación.
+     */
+    private function iconos(): array
+    {
+        $icono = etiqueta('icono');
+
+        if ($icono === '') {
+            return [];
+        }
+
+        $url = base_url($icono);
+
+        return [
+            ['src' => $url, 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'any'],
+            ['src' => $url, 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'maskable'],
+        ];
     }
 }

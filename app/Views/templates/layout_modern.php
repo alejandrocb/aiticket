@@ -21,7 +21,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="<?= esc(etiqueta('app'), 'attr') ?>">
-    <link rel="apple-touch-icon" href="<?= base_url('images/icon-192.png') ?>">
+    <?php if (etiqueta('icono')): ?>
+        <link rel="apple-touch-icon" href="<?= base_url(etiqueta('icono')) ?>">
+    <?php endif; ?>
     
     <link href="https://fonts.googleapis.com" rel="preconnect"/>
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>

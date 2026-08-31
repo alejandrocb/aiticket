@@ -51,12 +51,11 @@ self.addEventListener('push', function (event) {
     const title = data.title || 'Aiticket';
     const options = {
         body: data.body || 'Tienes una nueva notificación.',
-        // Foto de quien provoca el aviso; si no la hay, el logotipo de la
-        // aplicación. Van bajo images/, que sí está versionado. Si el fichero
-        // no existe el navegador simplemente no pinta el icono: ya no es un
-        // fallo que impida instalar el service worker.
-        icon: data.userPhoto || 'images/icon-192.png',
-        badge: 'images/badge.png',
+        // Foto de quien provoca el aviso; si no la hay, el icono de la
+        // instalación. Ambas rutas llegan dentro del aviso porque este fichero
+        // es estático y no puede leer la configuración.
+        icon: data.userPhoto || data.icono || undefined,
+        badge: data.badge || undefined,
         image: data.image || null,  // Imagen del ticket o movimiento (grande)
         vibrate: [200, 100, 200],
         tag: data.tag || 'aiticket-notification',
