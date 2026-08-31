@@ -37,9 +37,20 @@ class Etiquetas extends BaseConfig
      *
      * Vacío significa que no hay logotipo y se muestra el nombre en texto, que
      * es como se ha visto siempre. En cuanto se deje el fichero y se apunte
-     * aquí, aparece en la cabecera de los informes sin tocar código.
+     * aquí, aparece en la cabecera de la aplicación, en el acceso y en los
+     * informes, sin tocar código.
      */
     public string $logo = '';
+
+    /**
+     * Variante del logotipo para el modo oscuro de la aplicación.
+     *
+     * Un logotipo pensado para fondo claro suele desaparecer sobre fondo
+     * oscuro. Si se deja vacío se usa el mismo de arriba en ambos modos.
+     *
+     * En los informes impresos se usa siempre el claro: el papel es blanco.
+     */
+    public string $logoOscuro = '';
 
     /**
      * Quien reporta la incidencia, en singular. Se usa en etiquetas de

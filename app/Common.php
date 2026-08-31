@@ -38,3 +38,39 @@ if (! function_exists('etiqueta')) {
         return $etiquetas->{$clave} ?? $clave;
     }
 }
+
+if (! function_exists('marca')) {
+    /**
+     * Pinta el logotipo de la instalación, o su nombre en texto si todavía no
+     * hay fichero de logotipo configurado.
+     *
+     * Se emiten las dos variantes —clara y oscura— y se deja que el CSS enseñe
+     * la que toque, porque el tema se decide en el navegador antes de que
+     * cargue nada. Si no hay variante oscura configurada, se usa la clara en
+     * los dos modos.
+     *
+     * @param string $clasesImg   Alto del logotipo, p. ej. 'h-9'
+     * @param string $clasesTexto Estilo del nombre cuando no hay logotipo
+     * @param bool   $paraImprimir Fuerza la variante clara: el papel es blanco
+     */
+    function marca(string $clasesImg = 'h-9', string $clasesTexto = '', bool $paraImprimir = false): string
+    {
+        $claro  = etiqueta('logo');
+        $nombre = etiqueta('app');
+
+        if ($claro === '') {
+            return '<span class="' . $clasesTexto . '">' . esc($nombre) . '</span>';
+        }
+
+        $alt = ' alt="' . esc($nombre, 'attr') . '"';
+
+        if ($paraImprimir) {
+            return '<img src="' . base_url($claro) . '" class="' . $clasesImg . '"' . $alt . '>';
+        }
+
+        $oscuro = etiqueta('logoOscuro') ?: $claro;
+
+        return '<img src="' . base_url($claro) . '" class="' . $clasesImg . ' dark:hidden"' . $alt . '>'
+             . '<img src="' . base_url($oscuro) . '" class="' . $clasesImg . ' hidden dark:block"' . $alt . '>';
+    }
+}

@@ -11,7 +11,7 @@
     </script>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Soporte de Tickets - Iniciar Sesión / Registro</title>
+    <title><?= esc(etiqueta('app')) ?> - Iniciar Sesión</title>
     <link href="https://fonts.googleapis.com" rel="preconnect"/>
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
@@ -29,9 +29,9 @@
     </div>
     <div class="flex-1 flex flex-col px-8 -mt-8 relative z-20 pb-8 bg-surface-light dark:bg-surface-dark rounded-t-3xl border-t border-white/20 dark:border-white/5">
         <div class="mt-6 mb-8 text-center">
-            <h1 class="text-[#111418] dark:text-white tracking-tight text-3xl font-bold leading-tight pb-2">
-                Soporte de Tickets
-            </h1>
+            <div class="flex justify-center pb-2">
+                <?= marca('h-16 w-auto', 'text-[#111418] dark:text-white tracking-tight text-3xl font-bold leading-tight') ?>
+            </div>
             <p class="text-[#637588] dark:text-[#9dabb9] text-sm font-medium">
                 Gestiona tus tickets e historial de actividad.
             </p>

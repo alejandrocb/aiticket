@@ -22,7 +22,7 @@ $tiempoMedio = $minutos === null
     <!-- Cabecera: solo se ve en papel -->
     <div class="hidden print:flex items-center gap-4 border-b border-black pb-3 mb-2">
         <?php if (etiqueta('logo')): ?>
-            <img src="<?= base_url(etiqueta('logo')) ?>" alt="" class="h-14">
+            <?= marca('h-14 w-auto', '', true) ?>
         <?php endif; ?>
         <div>
             <h1 class="text-xl font-bold"><?= esc(etiqueta('app')) ?></h1>

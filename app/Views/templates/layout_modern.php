@@ -37,8 +37,8 @@
 <div class="relative flex h-full min-h-screen w-full flex-row">
     <!-- Desktop Sidebar -->
     <div class="hidden md:flex flex-col w-64 fixed h-full bg-surface-light dark:bg-surface-dark border-r border-[#e5e7eb] dark:border-[#283039] z-30">
-        <div class="p-4 border-b border-[#e5e7eb] dark:border-[#283039]">
-            <h2 class="text-[#111418] dark:text-white text-2xl font-bold leading-tight tracking-[-0.015em]"><?= etiqueta('app') ?></h2>
+        <div class="p-4 border-b border-[#e5e7eb] dark:border-[#283039] flex items-center">
+            <?= marca('h-10 w-auto', 'text-[#111418] dark:text-white text-2xl font-bold leading-tight tracking-[-0.015em]') ?>
         </div>
         <nav class="flex-1 overflow-y-auto p-4 space-y-2">
             <a href="<?= base_url('dashboard') ?>" class="flex items-center gap-3 w-full px-3 py-2 <?= (uri_string() == 'dashboard' || uri_string() == '/') ? 'bg-primary/10 text-primary' : 'text-text-secondary hover:text-[#111418] dark:hover:text-white hover:bg-gray-100 dark:hover:bg-[#2c3b4a]' ?> rounded-xl transition-colors">
@@ -87,7 +87,7 @@
         <!-- Top Sticky Header -->
         <div class="sticky top-0 z-20 bg-background-light dark:bg-background-dark/95 backdrop-blur-md border-b border-[#e5e7eb] dark:border-[#283039]">
             <div class="flex items-center p-4 pb-2 justify-between">
-                <h2 class="text-[#111418] dark:text-white text-2xl font-bold leading-tight tracking-[-0.015em] flex-1 md:hidden"><?= etiqueta('app') ?></h2>
+                <div class="flex items-center flex-1 md:hidden"><?= marca('h-8 w-auto', 'text-[#111418] dark:text-white text-2xl font-bold leading-tight tracking-[-0.015em]') ?></div>
                 <h2 class="text-[#111418] dark:text-white text-2xl font-bold leading-tight tracking-[-0.015em] flex-1 hidden md:block"><?= $title ?? 'Dashboard'; ?></h2>
                 <div class="flex items-center justify-end gap-3">
                     <a href="<?= base_url('tickets/crear') ?>" class="flex items-center justify-center rounded-lg h-10 w-10 bg-primary text-white shadow-lg shadow-primary/30 hover:bg-primary/90 transition-colors">
