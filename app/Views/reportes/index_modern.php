@@ -148,7 +148,7 @@ $tiempoMedio = $minutos === null
             <!-- Altura fija y position:relative. Chart.js redimensiona el
                  lienzo al tamaño del contenedor; si este no tiene altura
                  propia, crecen el uno al otro indefinidamente. -->
-            <div class="relative h-72">
+            <div class="grafica-caja relative h-72">
                 <canvas id="grafica-grupos"></canvas>
             </div>
         </div>
@@ -156,7 +156,7 @@ $tiempoMedio = $minutos === null
             <h3 class="text-sm font-bold text-[#111418] dark:text-white mb-3 print:text-black">
                 Evolución por <?= $evolucion['agrupacion'] === 'hora' ? 'hora' : 'día' ?>
             </h3>
-            <div class="relative h-72">
+            <div class="grafica-caja relative h-72">
                 <canvas id="grafica-evolucion"></canvas>
             </div>
         </div>
@@ -183,6 +183,22 @@ $tiempoMedio = $minutos === null
     tr { page-break-inside: avoid; }
     thead { display: table-header-group; }
 
+    /* Las gráficas necesitan una altura concreta en papel: el lienzo se
+       dimensiona contra su contenedor, y en milímetros no depende del ancho
+       de la ventana desde la que se imprima. */
+    .grafica-caja {
+        height: 55mm !important;
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+
+    /* Sin esto el lienzo conserva el tamaño en píxeles con el que se dibujó
+       en pantalla y se sale de la caja. */
+    .grafica-caja canvas {
+        max-width: 100% !important;
+        max-height: 100% !important;
+    }
+
     @page { margin: 14mm; }
 }
 </style>
@@ -201,7 +217,9 @@ $tiempoMedio = $minutos === null
     // color, y en blanco y negro sobre papel una paleta no aporta nada.
     var AZUL = '#137fec';
 
-    new Chart(document.getElementById('grafica-grupos'), {
+    var graficas = [];
+
+    graficas.push(new Chart(document.getElementById('grafica-grupos'), {
         type: 'bar',
         data: { labels: grupos, datasets: [{ data: totales, backgroundColor: AZUL, borderRadius: 4 }] },
         options: {
@@ -212,9 +230,9 @@ $tiempoMedio = $minutos === null
             maintainAspectRatio: false,
             animation: false
         }
-    });
+    }));
 
-    new Chart(document.getElementById('grafica-evolucion'), {
+    graficas.push(new Chart(document.getElementById('grafica-evolucion'), {
         type: 'line',
         data: {
             labels: momentos,
@@ -227,7 +245,39 @@ $tiempoMedio = $minutos === null
             maintainAspectRatio: false,
             animation: false
         }
-    });
+    }));
+
+    /**
+     * Redibujado al entrar y salir de impresión.
+     *
+     * Al imprimir cambia el ancho útil de la página —desaparece el menú y se
+     * anula el margen izquierdo— y el lienzo conserva el tamaño en píxeles con
+     * el que se dibujó en pantalla, así que se desborda de su caja.
+     *
+     * Se usa matchMedia('print') y no solo el evento beforeprint porque este
+     * último se dispara antes de que se apliquen los estilos de impresión: al
+     * recalcular en ese momento, la gráfica se mide todavía contra el ancho de
+     * pantalla. El cambio de media query sí ocurre con la maquetación de papel
+     * ya aplicada.
+     */
+    function recalcular() {
+        graficas.forEach(function (g) { g.resize(); });
+    }
+
+    if (window.matchMedia) {
+        var medioImpresion = window.matchMedia('print');
+        var alCambiar = function () { recalcular(); };
+
+        if (medioImpresion.addEventListener) {
+            medioImpresion.addEventListener('change', alCambiar);
+        } else if (medioImpresion.addListener) {
+            medioImpresion.addListener(alCambiar); // navegadores antiguos
+        }
+    }
+
+    // Respaldo para navegadores que no notifican el cambio de media query.
+    window.addEventListener('beforeprint', recalcular);
+    window.addEventListener('afterprint', recalcular);
 })();
 </script>
 <?php endif; ?>
