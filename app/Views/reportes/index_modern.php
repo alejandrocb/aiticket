@@ -144,21 +144,32 @@ $tiempoMedio = $minutos === null
     <!-- Gráficas -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 print:grid-cols-2">
         <div class="rounded-xl border border-[#e5e7eb] dark:border-transparent bg-surface-light dark:bg-surface-dark p-4 print:border-black">
-            <h3 class="text-sm font-bold text-[#111418] dark:text-white mb-3 print:text-black">Reparto por <?= esc(strtolower(etiqueta('cliente'))) ?></h3>
+            <h3 class="text-sm font-bold text-[#111418] dark:text-white mb-3 print:text-black">
+                Comparativa por <?= esc(strtolower(etiqueta('cliente'))) ?>
+            </h3>
             <!-- Altura fija y position:relative. Chart.js redimensiona el
                  lienzo al tamaño del contenedor; si este no tiene altura
                  propia, crecen el uno al otro indefinidamente. -->
-            <div class="grafica-caja relative h-72">
+            <div class="grafica-caja relative h-80">
                 <canvas id="grafica-grupos"></canvas>
             </div>
         </div>
         <div class="rounded-xl border border-[#e5e7eb] dark:border-transparent bg-surface-light dark:bg-surface-dark p-4 print:border-black">
             <h3 class="text-sm font-bold text-[#111418] dark:text-white mb-3 print:text-black">
-                Evolución por <?= $evolucion['agrupacion'] === 'hora' ? 'hora' : 'día' ?>
+                Reparto del total
             </h3>
-            <div class="grafica-caja relative h-72">
-                <canvas id="grafica-evolucion"></canvas>
+            <div class="grafica-caja relative h-80">
+                <canvas id="grafica-reparto"></canvas>
             </div>
+        </div>
+    </div>
+
+    <div class="rounded-xl border border-[#e5e7eb] dark:border-transparent bg-surface-light dark:bg-surface-dark p-4 print:border-black">
+        <h3 class="text-sm font-bold text-[#111418] dark:text-white mb-3 print:text-black">
+            Evolución por <?= $evolucion['agrupacion'] === 'hora' ? 'hora' : 'día' ?>
+        </h3>
+        <div class="grafica-caja relative h-64">
+            <canvas id="grafica-evolucion"></canvas>
         </div>
     </div>
 
@@ -187,7 +198,7 @@ $tiempoMedio = $minutos === null
        dimensiona contra su contenedor, y en milímetros no depende del ancho
        de la ventana desde la que se imprima. */
     .grafica-caja {
-        height: 55mm !important;
+        height: 62mm !important;
         page-break-inside: avoid;
         break-inside: avoid;
     }
@@ -210,22 +221,82 @@ $tiempoMedio = $minutos === null
 
     var grupos = <?= json_encode(array_map(static fn($f) => $f['grupo'], $porGrupo)) ?>;
     var totales = <?= json_encode(array_map(static fn($f) => (int) $f['total'], $porGrupo)) ?>;
+    var abiertas = <?= json_encode(array_map(static fn($f) => (int) $f['abiertas'], $porGrupo)) ?>;
+    var cerradas = <?= json_encode(array_map(static fn($f) => (int) $f['cerradas'], $porGrupo)) ?>;
     var momentos = <?= json_encode(array_map(static fn($f) => $f['momento'], $evolucion['filas'])) ?>;
     var conteos = <?= json_encode(array_map(static fn($f) => (int) $f['total'], $evolucion['filas'])) ?>;
 
-    // Un solo color: las barras distinguen grupos por su etiqueta, no por
-    // color, y en blanco y negro sobre papel una paleta no aporta nada.
     var AZUL = '#137fec';
+    var VERDE = '#16a34a';
+
+    /**
+     * Paleta de la tarta, ordenada de oscuro a claro a propósito.
+     *
+     * El informe se imprime, y muchas veces en blanco y negro: colores
+     * elegidos solo por tono se convierten en grises casi idénticos. Al
+     * escalonar la luminosidad, las porciones se siguen distinguiendo
+     * impresas.
+     */
+    var PALETA = ['#0b3d69', '#137fec', '#3b9bf5', '#6bb4f8', '#93c9fa',
+                  '#7f1d1d', '#c0392b', '#e05c4a', '#ef8a7a', '#f7b8ad', '#cbd5e1'];
 
     var graficas = [];
 
+    // Comparativa: abiertas y cerradas apiladas, para ver de un vistazo cuánto
+    // registró cada grupo y cuánto queda por resolver. Los grupos sin
+    // incidencias aparecen igualmente, con la barra a cero.
     graficas.push(new Chart(document.getElementById('grafica-grupos'), {
         type: 'bar',
-        data: { labels: grupos, datasets: [{ data: totales, backgroundColor: AZUL, borderRadius: 4 }] },
+        data: {
+            labels: grupos,
+            datasets: [
+                { label: 'Abiertas', data: abiertas, backgroundColor: AZUL },
+                { label: 'Cerradas', data: cerradas, backgroundColor: VERDE }
+            ]
+        },
         options: {
             indexAxis: 'y',
-            plugins: { legend: { display: false } },
-            scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } },
+            scales: {
+                x: { stacked: true, beginAtZero: true, ticks: { precision: 0 } },
+                y: { stacked: true, ticks: { font: { size: 10 } } }
+            },
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false
+        }
+    }));
+
+    // Reparto del total. Se excluyen los grupos a cero: una porción vacía no
+    // se ve y solo ensucia la leyenda.
+    var repartoEtiquetas = [], repartoDatos = [], repartoColores = [];
+    grupos.forEach(function (nombre, i) {
+        if (totales[i] > 0) {
+            repartoColores.push(PALETA[repartoEtiquetas.length % PALETA.length]);
+            repartoEtiquetas.push(nombre);
+            repartoDatos.push(totales[i]);
+        }
+    });
+
+    graficas.push(new Chart(document.getElementById('grafica-reparto'), {
+        type: 'doughnut',
+        data: {
+            labels: repartoEtiquetas,
+            datasets: [{ data: repartoDatos, backgroundColor: repartoColores, borderColor: '#fff', borderWidth: 1 }]
+        },
+        options: {
+            plugins: {
+                legend: { position: 'right', labels: { boxWidth: 12, font: { size: 10 } } },
+                tooltip: {
+                    callbacks: {
+                        label: function (ctx) {
+                            var suma = ctx.dataset.data.reduce(function (a, b) { return a + b; }, 0);
+                            var pct = suma ? Math.round(ctx.parsed / suma * 100) : 0;
+                            return ctx.label + ': ' + ctx.parsed + ' (' + pct + '%)';
+                        }
+                    }
+                }
+            },
             responsive: true,
             maintainAspectRatio: false,
             animation: false

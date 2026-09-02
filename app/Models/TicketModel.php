@@ -380,25 +380,58 @@ class TicketModel extends Model
         ];
     }
 
-    /** Incidencias por grupo de acción, con su reparto entre abiertas y cerradas. */
+    /**
+     * Incidencias por grupo de acción, con su reparto entre abiertas y
+     * cerradas.
+     *
+     * La consulta parte de `clientes` y no de `tickets`, con una unión por la
+     * izquierda, para que **los grupos sin ninguna incidencia también salgan,
+     * con un cero**. En el balance de un dispositivo, saber que un grupo no
+     * reportó nada es tan informativo como saber cuánto reportó otro; si se
+     * partiera de los tickets, esos grupos desaparecerían del informe.
+     *
+     * Por eso el filtro de fechas va en la condición de la unión y no en el
+     * WHERE: puesto en el WHERE descartaría las filas sin incidencias, que es
+     * justo lo que se quiere conservar.
+     */
     public function resumenPorGrupo(?string $desde = null, ?string $hasta = null): array
     {
-        if (! $builder = $this->baseInforme($desde, $hasta)) {
+        $escenariosActivos = $this->getEscenariosActivos();
+
+        if (empty($escenariosActivos)) {
             return [];
         }
 
+        $db         = \Config\Database::connect();
         $noAbiertos = implode(',', self::ESTADOS_NO_ABIERTOS);
+        $escenarios = implode(',', array_map('intval', $escenariosActivos));
 
-        return $builder->select(
-            'c.id AS cliente_id, c.nombre AS grupo,
-             COUNT(t.id) AS total,
-             SUM(CASE WHEN t.estado_ticket_id NOT IN (' . $noAbiertos . ') THEN 1 ELSE 0 END) AS abiertas,
-             SUM(CASE WHEN t.estado_ticket_id = ' . self::ESTADO_CERRADO . ' THEN 1 ELSE 0 END) AS cerradas',
-            false
-        )->join('clientes c', 'c.id = t.cliente_id')
-         ->groupBy('c.id, c.nombre')
-         ->orderBy('total', 'DESC')
-         ->get()->getResultArray();
+        // El escenario se comprueba también sobre el ticket: al mover un grupo
+        // de escenario, sus incidencias antiguas conservan el suyo.
+        $condicion = 't.cliente_id = c.id AND t.escenario_id IN (' . $escenarios . ')';
+
+        if ($desde) {
+            $condicion .= ' AND t.fecha_creacion >= ' . $db->escape($desde . ' 00:00:00');
+        }
+
+        if ($hasta) {
+            $condicion .= ' AND t.fecha_creacion <= ' . $db->escape($hasta . ' 23:59:59');
+        }
+
+        return $db->table('clientes c')
+                  ->select(
+                      'c.id AS cliente_id, c.nombre AS grupo,
+                       COUNT(t.id) AS total,
+                       SUM(CASE WHEN t.estado_ticket_id NOT IN (' . $noAbiertos . ') THEN 1 ELSE 0 END) AS abiertas,
+                       SUM(CASE WHEN t.estado_ticket_id = ' . self::ESTADO_CERRADO . ' THEN 1 ELSE 0 END) AS cerradas',
+                      false
+                  )
+                  ->join('tickets t', $condicion, 'left')
+                  ->whereIn('c.escenario', $escenariosActivos)
+                  ->groupBy('c.id, c.nombre')
+                  ->orderBy('total', 'DESC')
+                  ->orderBy('c.nombre', 'ASC')
+                  ->get()->getResultArray();
     }
 
     /**
