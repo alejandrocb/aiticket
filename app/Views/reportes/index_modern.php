@@ -230,15 +230,30 @@ $tiempoMedio = $minutos === null
     var VERDE = '#16a34a';
 
     /**
-     * Paleta de la tarta, ordenada de oscuro a claro a propósito.
+     * Paleta del anillo: familias de color intercaladas y luminosidad
+     * alternada entre oscuro y claro.
      *
-     * El informe se imprime, y muchas veces en blanco y negro: colores
-     * elegidos solo por tono se convierten en grises casi idénticos. Al
-     * escalonar la luminosidad, las porciones se siguen distinguiendo
-     * impresas.
+     * Las dos cosas a la vez, y por motivos distintos. El tono cambia en cada
+     * porción para que en pantalla se distingan aunque solo haya tres o cuatro
+     * grupos con incidencias: agrupadas por familia, los primeros salían todos
+     * azules. Y la luminosidad se alterna porque el informe se imprime, muchas
+     * veces en blanco y negro, donde el tono desaparece y solo queda el brillo:
+     * colores distintos pero de luminosidad parecida acaban siendo el mismo
+     * gris.
      */
-    var PALETA = ['#0b3d69', '#137fec', '#3b9bf5', '#6bb4f8', '#93c9fa',
-                  '#7f1d1d', '#c0392b', '#e05c4a', '#ef8a7a', '#f7b8ad', '#cbd5e1'];
+    var PALETA = [
+        '#0b3d69', // azul oscuro
+        '#f59e0b', // ámbar
+        '#7f1d1d', // granate
+        '#93c9fa', // azul claro
+        '#0f766e', // verde azulado
+        '#f7b8ad', // rosa claro
+        '#6b21a8', // morado
+        '#86efac', // verde claro
+        '#713f12', // marrón
+        '#a5b4fc', // lavanda
+        '#137fec'  // azul medio
+    ];
 
     var graficas = [];
 
